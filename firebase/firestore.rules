@@ -3,7 +3,7 @@ rules_version = '2';
 // Kiosk account (Email/Password provider) used by the booth desktop.
 // Keep in sync with docs/FIREBASE_SETUP.md.
 function isKiosk() {
-  return request.auth != null && request.auth.token.email == 'kiosk@captain-shootout.app';
+  return request.auth != null && request.auth.token.email == 'main@trycaptain.app';
 }
 
 service cloud.firestore {

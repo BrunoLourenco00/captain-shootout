@@ -7,7 +7,7 @@ tests use the offline `demo-captain-shootout` emulator project and need none of 
 
 1. **Authentication → Sign-in method**: enable **Anonymous** (phones) and
    **Email/Password** (kiosk).
-2. **Authentication → Users → Add user**: `kiosk@captain-shootout.app` with a strong
+2. **Authentication → Users → Add user**: `main@trycaptain.app` with a strong
    password. Do this before the event: `firebase/firestore.rules` only lets this email
    write the leaderboard, so nobody else must be able to claim it.
 3. **Realtime Database**: created (europe-west1). **Firestore**: create it in
@@ -32,7 +32,7 @@ VITE_FIREBASE_APP_ID=...
 ```bash
 # URL encoded in the QR code: the deployed controller.
 VITE_CONTROLLER_BASE_URL=https://challenge.trycaptain.app   # or https://captain-shootout.web.app
-VITE_KIOSK_EMAIL=kiosk@captain-shootout.app
+VITE_KIOSK_EMAIL=main@trycaptain.app
 VITE_KIOSK_PASSWORD=<kiosk password>
 ```
 

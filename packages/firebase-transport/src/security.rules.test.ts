@@ -17,7 +17,7 @@ import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 const root = resolve(__dirname, '../../..');
 const SID = 'SESSION1';
 const TOKEN = 'secrettoken12345';
-const KIOSK_EMAIL = 'kiosk@captain-shootout.app';
+const KIOSK_EMAIL = 'main@trycaptain.app';
 
 let env: RulesTestEnvironment;
 
