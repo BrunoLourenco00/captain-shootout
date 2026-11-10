@@ -15,7 +15,11 @@ apps/
     src/game/scene/    React Three Fiber + Rapier scene
     src/features/      Overlays and HUD
     src/input/         Demo (mouse/keyboard) input and operator shortcuts
-  controller-mobile/   Phone controller (Phase 2)
+  controller-mobile/   Phone controller
+    src/app/           Pure controller state (screens, local shot throttle)
+    src/gestures/      Pointer Events swipe capture
+    src/services/      Transport selection (mock until Phase 3)
+    src/features/      Screens
 packages/
   game-protocol/       Shared contracts, config, input validation, swipe mapping, nicknames
 ```
@@ -30,7 +34,7 @@ packages/
 ```bash
 pnpm install
 pnpm dev:desktop    # http://localhost:5173
-pnpm dev:mobile     # http://localhost:5174 (exposed on the LAN)
+pnpm dev:mobile     # http://localhost:5174/?s=TEST1&t=test1 (also on the LAN, for a real phone)
 ```
 
 Checks:
@@ -58,6 +62,6 @@ pnpm build
 
 - [x] Phase 0 — monorepo foundation
 - [x] Phase 1 — 3D prototype, physics, basket detection, scoring, demo round loop
-- [ ] Phase 2 — mobile controller
+- [x] Phase 2 — mobile controller (nickname, ready, swipe, results) against a mock transport
 - [ ] Phase 3 — Firebase sessions, QR, real-time shots
 - [ ] Phase 4/5 — leaderboard, kiosk hardening
