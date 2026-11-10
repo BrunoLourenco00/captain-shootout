@@ -59,6 +59,11 @@ export interface ControllerTransport {
     onView: (view: ControllerView) => void;
     onConnection: (state: ConnectionState) => void;
   }): () => void;
+  /**
+   * After a page reload, reattaches this device to a session it already joined.
+   * Resolves with the nickname, or null when the device is not this session's player.
+   */
+  resume(params: JoinParams): Promise<string | null>;
   leave(): Promise<void>;
 }
 

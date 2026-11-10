@@ -15,7 +15,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm typecheck && pnpm lint && pnpm test"
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "emulators": "firebase emulators:start --project demo-captain-shootout",
+    "deploy:controller": "pnpm --filter @captain/controller-mobile build && firebase deploy --only hosting",
+    "deploy:rules": "firebase deploy --only database,firestore"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

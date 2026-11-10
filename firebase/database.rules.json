@@ -1,0 +1,42 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "sessions": {
+      "$sid": {
+        ".read": "auth != null && data.child('public/hostUid').val() === auth.uid",
+        ".write": "auth != null && ((!data.exists() && newData.child('public/hostUid').val() === auth.uid) || data.child('public/hostUid').val() === auth.uid)",
+        "public": {
+          ".read": true
+        },
+        "secret": {
+          ".read": false
+        },
+        "controller": {
+          ".read": "auth != null && (data.child('uid').val() === auth.uid || root.child('sessions/' + $sid + '/public/hostUid').val() === auth.uid)",
+          ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('token').val() === root.child('sessions/' + $sid + '/secret/token').val() && root.child('sessions/' + $sid + '/public/status').val() === 'open'",
+          ".validate": "newData.hasChildren(['uid', 'nickname', 'token', 'joinedAt']) && newData.child('nickname').isString() && newData.child('nickname').val().length >= 2 && newData.child('nickname').val().length <= 16 && newData.child('joinedAt').isNumber()"
+        },
+        "presence": {
+          "controller": {
+            ".write": "auth != null && root.child('sessions/' + $sid + '/controller/uid').val() === auth.uid",
+            ".validate": "newData.isBoolean()"
+          }
+        },
+        "ready": {
+          ".write": "auth != null && root.child('sessions/' + $sid + '/controller/uid').val() === auth.uid",
+          ".validate": "newData.isBoolean()"
+        },
+        "shots": {
+          "$shotId": {
+            ".write": "auth != null && !data.exists() && root.child('sessions/' + $sid + '/controller/uid').val() === auth.uid",
+            ".validate": "newData.hasChildren(['sessionId', 'shotId', 'directionX', 'directionY', 'power', 'clientTimestamp']) && newData.child('shotId').val() === $shotId && newData.child('sessionId').val() === $sid && newData.child('directionX').isNumber() && newData.child('directionY').isNumber() && newData.child('power').isNumber() && newData.child('clientTimestamp').isNumber()"
+          }
+        },
+        "view": {
+          ".read": "auth != null && root.child('sessions/' + $sid + '/controller/uid').val() === auth.uid"
+        }
+      }
+    }
+  }
+}

@@ -112,6 +112,10 @@ export function createMockTransport(config = DEFAULT_GAME_CONFIG): ControllerTra
       };
     },
 
+    async resume() {
+      return null;
+    },
+
     async leave() {
       for (const id of timers) clearTimeout(id);
       timers.clear();
