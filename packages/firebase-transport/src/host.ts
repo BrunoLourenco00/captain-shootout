@@ -16,12 +16,14 @@ import {
   onValue,
   ref,
   remove,
+  serverTimestamp,
   set,
   update,
   type DatabaseReference,
 } from 'firebase/database';
 import { getFirebase, type FirebaseSettings } from './firebase';
 import {
+  HEARTBEAT_INTERVAL_MS,
   controllerPath,
   presencePath,
   publicPath,
@@ -63,15 +65,27 @@ export function createFirebaseHostTransport(
   kiosk: KioskCredentials | null,
 ): HostTransport {
   const { auth, db } = getFirebase(settings);
-  let current: { sessionId: string; listeners: DatabaseReference[] } | null = null;
+  let current: {
+    sessionId: string;
+    listeners: DatabaseReference[];
+    heartbeat: ReturnType<typeof setInterval>;
+  } | null = null;
+  // Open/close run strictly one after another (React may fire effects twice in dev).
+  let queue: Promise<unknown> = Promise.resolve();
+  function serial<T>(task: () => Promise<T>): Promise<T> {
+    const run = queue.then(task, task);
+    queue = run.catch(() => {});
+    return run;
+  }
 
   function detach() {
     if (!current) return;
     for (const r of current.listeners) off(r);
+    clearInterval(current.heartbeat);
     current = null;
   }
 
-  async function closeSession() {
+  async function closeCurrent() {
     if (!current) return;
     const { sessionId } = current;
     detach();
@@ -90,49 +104,60 @@ export function createFirebaseHostTransport(
   }
 
   return {
-    async openSession(handlers: HostHandlers): Promise<HostSessionInfo> {
-      await closeSession();
-      const user = await signInHost(auth, kiosk, settings.useEmulators);
-      const sessionId = randomId(8);
-      const token = randomId(16);
-      const pub: SessionPublic = { status: 'open', hostUid: user.uid, createdAt: Date.now() };
-      await set(ref(db, sessionPath(sessionId)), { public: pub, secret: { token } });
-
-      const controllerRef = ref(db, controllerPath(sessionId));
-      const presenceRef = ref(db, presencePath(sessionId));
-      const readyRef = ref(db, readyPath(sessionId));
-      const shotsRef = ref(db, shotsPath(sessionId));
-      current = { sessionId, listeners: [controllerRef, presenceRef, readyRef, shotsRef] };
-
-      let joined = false;
-      onValue(controllerRef, (snap) => {
-        const controller = snap.val() as SessionController | null;
-        if (!controller || joined) return;
-        joined = true;
-        void set(ref(db, `${publicPath(sessionId)}/status`), 'taken');
-        handlers.onJoin({ nickname: String(controller.nickname ?? '') });
-      });
-      onValue(presenceRef, (snap) => {
-        if (snap.exists()) handlers.onControllerPresence(snap.val() === true);
-      });
-      onValue(readyRef, (snap) => {
-        if (snap.val() === true) handlers.onReady();
-      });
-      onChildAdded(shotsRef, (snap) => handlers.onShot(snap.val()));
-
-      return { sessionId, token };
-    },
+    openSession: (handlers: HostHandlers) => serial(() => open(handlers)),
 
     async publishView(view: ControllerView) {
       if (!current) return;
       await set(ref(db, viewPath(current.sessionId)), view);
     },
 
-    closeSession,
+    closeSession: () => serial(closeCurrent),
 
     onConnection(listener) {
       const connectedRef = ref(db, '.info/connected');
       return onValue(connectedRef, (snap) => listener(snap.val() === true));
     },
   };
+
+  async function open(handlers: HostHandlers): Promise<HostSessionInfo> {
+    await closeCurrent();
+    const user = await signInHost(auth, kiosk, settings.useEmulators);
+    const sessionId = randomId(8);
+    const token = randomId(16);
+    const pub: Omit<SessionPublic, 'createdAt' | 'heartbeatAt'> = {
+      status: 'open',
+      hostUid: user.uid,
+    };
+    await set(ref(db, sessionPath(sessionId)), {
+      public: { ...pub, createdAt: serverTimestamp(), heartbeatAt: serverTimestamp() },
+      secret: { token },
+    });
+    const heartbeat = setInterval(() => {
+      void set(ref(db, `${publicPath(sessionId)}/heartbeatAt`), serverTimestamp()).catch(() => {});
+    }, HEARTBEAT_INTERVAL_MS);
+
+    const controllerRef = ref(db, controllerPath(sessionId));
+    const presenceRef = ref(db, presencePath(sessionId));
+    const readyRef = ref(db, readyPath(sessionId));
+    const shotsRef = ref(db, shotsPath(sessionId));
+    current = { sessionId, listeners: [controllerRef, presenceRef, readyRef, shotsRef], heartbeat };
+
+    let joined = false;
+    onValue(controllerRef, (snap) => {
+      const controller = snap.val() as SessionController | null;
+      if (!controller || joined) return;
+      joined = true;
+      void set(ref(db, `${publicPath(sessionId)}/status`), 'taken');
+      handlers.onJoin({ nickname: String(controller.nickname ?? '') });
+    });
+    onValue(presenceRef, (snap) => {
+      if (snap.exists()) handlers.onControllerPresence(snap.val() === true);
+    });
+    onValue(readyRef, (snap) => {
+      if (snap.val() === true) handlers.onReady();
+    });
+    onChildAdded(shotsRef, (snap) => handlers.onShot(snap.val()));
+
+    return { sessionId, token };
+  }
 }

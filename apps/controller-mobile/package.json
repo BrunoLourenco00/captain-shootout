@@ -8,9 +8,11 @@
     "build": "tsc -p tsconfig.json && vite build",
     "preview": "vite preview --host",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "dev:emulators": "vite --host --mode emulators"
   },
   "dependencies": {
+    "@captain/firebase-transport": "workspace:*",
     "@captain/game-protocol": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

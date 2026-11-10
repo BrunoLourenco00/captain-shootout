@@ -18,7 +18,7 @@ import {
   where,
   type Firestore,
 } from 'firebase/firestore';
-import { EMULATOR_HOST, EMULATOR_PORTS, getFirebase, type FirebaseSettings } from './firebase';
+import { EMULATOR_PORTS, getFirebase, type FirebaseSettings } from './firebase';
 
 /** Firestore: leaderboard/{nicknameKey} holds each nickname's best result. */
 const COLLECTION = 'leaderboard';
@@ -30,7 +30,7 @@ function getDb(settings: FirebaseSettings): Firestore {
   const { app } = getFirebase(settings);
   firestore = getFirestore(app);
   if (settings.useEmulators) {
-    connectFirestoreEmulator(firestore, EMULATOR_HOST, EMULATOR_PORTS.firestore);
+    connectFirestoreEmulator(firestore, settings.emulatorHost, EMULATOR_PORTS.firestore);
   }
   return firestore;
 }

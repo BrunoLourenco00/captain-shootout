@@ -13,6 +13,7 @@ export interface ActiveBall {
 export interface ShotFeedback {
   /** Increments on every feedback so the UI can re-trigger animations. */
   seq: number;
+  shotId: string;
   outcome: ShotOutcome;
   points: number;
   multiplied: boolean;
@@ -23,8 +24,12 @@ export type GameMode = 'live' | 'demo';
 export interface GameState {
   status: GameStatus;
   mode: GameMode;
-  sessionId: string;
+  /** Open transport session the QR code points to (null while (re)opening one). */
+  sessionId: string | null;
   nickname: string | null;
+  controllerConnected: boolean;
+  /** Leaderboard rank of the last finished round, once saved. */
+  rank: number | null;
   /** Deadline for the current status (ready timeout, countdown, round, buzzer grace, results). */
   statusEndsAt: number | null;
   roundEndsAt: number | null;
@@ -36,21 +41,29 @@ export interface GameState {
 }
 
 export type GameAction =
+  | { type: 'SESSION_OPENED'; sessionId: string }
   | { type: 'PLAYER_JOINED'; sessionId: string; nickname: string; now: number }
+  | { type: 'CONTROLLER_PRESENCE'; connected: boolean }
+  | { type: 'RESULT_SAVED'; rank: number | null }
   | { type: 'PLAYER_READY'; now: number }
   | { type: 'DEMO_START'; now: number }
   | { type: 'TICK'; now: number }
   | { type: 'SHOT'; command: ShotCommand; now: number }
   | { type: 'SHOT_RESOLVED'; shotId: string; outcome: ShotOutcome }
   | { type: 'BALL_REMOVED'; shotId: string }
-  | { type: 'RESET'; sessionId: string };
+  | { type: 'RESET' };
 
-export function createInitialState(sessionId: string): GameState {
+/** Session id used for locally generated demo shots. */
+export const DEMO_SESSION_ID = 'demo';
+
+export function createInitialState(sessionId: string | null = null): GameState {
   return {
     status: 'attract',
     mode: 'live',
     sessionId,
     nickname: null,
+    controllerConnected: false,
+    rank: null,
     statusEndsAt: null,
     roundEndsAt: null,
     score: EMPTY_SCORE,
@@ -113,6 +126,7 @@ function resolveBall(
     balls: state.balls.map((b) => (b.shotId === shotId ? { ...b, resolved: true } : b)),
     feedback: {
       seq: (state.feedback?.seq ?? 0) + 1,
+      shotId,
       outcome,
       points,
       multiplied: outcome !== 'missed' && score.streak >= config.scoring.streakThreshold,
@@ -138,7 +152,8 @@ function tick(state: GameState, now: number, config: GameConfig): GameState {
   }
   switch (state.status) {
     case 'connected':
-      return createInitialState(state.sessionId);
+      // Ready timeout: drop the player; a new session (and QR) will be opened.
+      return createInitialState();
     case 'countdown':
       return { ...state, status: 'playing', statusEndsAt: state.roundEndsAt };
     case 'playing':
@@ -146,7 +161,7 @@ function tick(state: GameState, now: number, config: GameConfig): GameState {
     case 'finished':
       return toResults(state, now, config);
     case 'results':
-      return createInitialState(state.sessionId);
+      return createInitialState();
     case 'attract':
       return state;
   }
@@ -155,13 +170,19 @@ function tick(state: GameState, now: number, config: GameConfig): GameState {
 export function makeGameReducer(config: GameConfig) {
   return function gameReducer(state: GameState, action: GameAction): GameState {
     switch (action.type) {
+      case 'SESSION_OPENED':
+        if (state.status !== 'attract') return state;
+        return { ...state, sessionId: action.sessionId };
+
       case 'PLAYER_JOINED':
-        if (state.status !== 'attract' || action.sessionId !== state.sessionId) return state;
+        if (state.status !== 'attract' || state.sessionId === null) return state;
+        if (action.sessionId !== state.sessionId) return state;
         return {
           ...state,
           status: 'connected',
           mode: 'live',
           nickname: action.nickname,
+          controllerConnected: true,
           statusEndsAt: action.now + config.readyTimeoutMs,
         };
 
@@ -169,11 +190,19 @@ export function makeGameReducer(config: GameConfig) {
         if (state.status !== 'connected') return state;
         return startCountdown(state, action.now, config);
 
+      case 'CONTROLLER_PRESENCE':
+        // Informational only: a round keeps running if the phone drops (see DECISIONS.md).
+        if (state.mode !== 'live' || state.status === 'attract') return state;
+        return { ...state, controllerConnected: action.connected };
+
+      case 'RESULT_SAVED':
+        if (state.status !== 'results') return state;
+        return { ...state, rank: action.rank };
+
       case 'DEMO_START':
         if (state.status !== 'attract') return state;
         return startCountdown(
-          // Demo shots are produced locally against the current session id.
-          { ...state, mode: 'demo', nickname: 'DEMO' },
+          { ...state, mode: 'demo', sessionId: DEMO_SESSION_ID, nickname: 'DEMO' },
           action.now,
           config,
         );
@@ -214,7 +243,7 @@ export function makeGameReducer(config: GameConfig) {
       }
 
       case 'RESET':
-        return createInitialState(action.sessionId);
+        return createInitialState();
     }
   };
 }

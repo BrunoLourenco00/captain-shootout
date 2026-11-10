@@ -9,7 +9,8 @@ import type {
 export type ControllerError = JoinError | NicknameError;
 
 export interface ControllerState {
-  step: 'nickname' | 'joining' | 'joined';
+  /** 'resuming' = checking whether this device already joined (page reload). */
+  step: 'resuming' | 'nickname' | 'joining' | 'joined';
   error: ControllerError | null;
   view: ControllerView | null;
   connection: ConnectionState;
@@ -18,6 +19,7 @@ export interface ControllerState {
 }
 
 export type ControllerAction =
+  | { type: 'RESUME_FAILED' }
   | { type: 'JOIN_REQUESTED' }
   | { type: 'JOIN_FAILED'; error: ControllerError }
   | { type: 'JOINED' }
@@ -27,7 +29,7 @@ export type ControllerAction =
   | { type: 'SHOT_SENT'; now: number };
 
 export const INITIAL_CONTROLLER_STATE: ControllerState = {
-  step: 'nickname',
+  step: 'resuming',
   error: null,
   view: null,
   connection: 'online',
@@ -40,6 +42,8 @@ export function controllerReducer(
   action: ControllerAction,
 ): ControllerState {
   switch (action.type) {
+    case 'RESUME_FAILED':
+      return state.step === 'resuming' ? { ...state, step: 'nickname' } : state;
     case 'JOIN_REQUESTED':
       return { ...state, step: 'joining', error: null };
     case 'JOIN_FAILED':
@@ -61,6 +65,7 @@ export type ControllerScreen =
   'nickname' | 'waiting' | 'ready' | 'countdown' | 'playing' | 'results' | 'ended';
 
 export function selectScreen(state: ControllerState): ControllerScreen {
+  if (state.step === 'resuming') return 'waiting';
   if (state.step !== 'joined') return 'nickname';
   const view = state.view;
   if (!view) return 'waiting';

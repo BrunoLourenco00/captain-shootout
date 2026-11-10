@@ -1,6 +1,8 @@
-import type { GameConfig } from '@captain/game-protocol';
+import type { GameConfig, LeaderboardEntry } from '@captain/game-protocol';
+import { QRCodeSVG } from 'qrcode.react';
 import { accuracy, isOnFire } from '../../game/scoring/scoring';
 import type { GameState, ShotFeedback } from '../../game/state/gameState';
+import type { HostSessionState } from '../../services/useHostSession';
 import { useNow } from '../useNow';
 
 function secondsLeft(deadline: number | null, now: number): number {
@@ -15,20 +17,67 @@ function Wordmark() {
   );
 }
 
-export function AttractOverlay({ joinUrl }: { joinUrl: string | null }) {
+function QrSlot({ host }: { host: HostSessionState }) {
+  if (!host.configured) {
+    return <span className="qr-pending">DEMO ONLY</span>;
+  }
+  if (!host.joinUrl) {
+    return <span className="qr-pending">{host.online ? 'LOADING…' : 'OFFLINE'}</span>;
+  }
+  return (
+    <QRCodeSVG
+      value={host.joinUrl}
+      size={512}
+      level="M"
+      marginSize={2}
+      bgColor="#F7F9FB"
+      fgColor="#0B1220"
+      style={{ width: '100%', height: '100%' }}
+      title="Scan to play"
+    />
+  );
+}
+
+function LeaderboardList({
+  entries,
+  highlight,
+}: {
+  entries: LeaderboardEntry[];
+  highlight?: string;
+}) {
+  if (entries.length === 0) return null;
+  return (
+    <ol className="leaderboard">
+      {entries.map((e, i) => (
+        <li key={e.nickname} className={e.nickname === highlight ? 'me' : undefined}>
+          <span className="pos">{i + 1}</span>
+          <span className="nick">{e.nickname}</span>
+          <span className="pts">{e.score}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+export function AttractOverlay({ host }: { host: HostSessionState }) {
   return (
     <div className="overlay attract">
       <Wordmark />
       <div className="attract-card">
-        <div className="qr-slot" aria-label="QR code">
-          {/* Real QR code arrives with the session transport (Phase 3). */}
-          {joinUrl ? <span className="qr-pending">QR</span> : <span className="qr-pending">…</span>}
+        <div className="qr-slot" aria-label="QR code" data-join-url={host.joinUrl ?? undefined}>
+          <QrSlot host={host} />
         </div>
         <div>
           <h1 className="cta">SCAN TO PLAY</h1>
           <p className="tagline">Scan. Swipe. Score.</p>
           <p className="muted">30 seconds. Swipe up on your phone to shoot.</p>
         </div>
+        {host.leaderboard.length > 0 && (
+          <div className="attract-board">
+            <p className="muted">TOP SCORES</p>
+            <LeaderboardList entries={host.leaderboard} />
+          </div>
+        )}
       </div>
       {import.meta.env.DEV && (
         <p className="dev-hint">Dev: Ctrl+Shift+D demo · Ctrl+Shift+X reset</p>
@@ -68,6 +117,9 @@ export function Hud({ state, config }: { state: GameState; config: GameConfig })
       <div className="hud-block">
         <span className="hud-label">PLAYER</span>
         <span className="hud-value">{state.nickname}</span>
+        {state.mode === 'live' && !state.controllerConnected && (
+          <span className="phone-lost">📱 PHONE DISCONNECTED</span>
+        )}
       </div>
       <div className={`hud-block hud-time ${left <= 5 ? 'urgent' : ''}`}>
         <span className="hud-label">TIME</span>
@@ -100,7 +152,13 @@ export function FeedbackPop({ feedback }: { feedback: ShotFeedback | null }) {
   );
 }
 
-export function ResultsOverlay({ state }: { state: GameState }) {
+export function ResultsOverlay({
+  state,
+  leaderboard,
+}: {
+  state: GameState;
+  leaderboard: LeaderboardEntry[];
+}) {
   const now = useNow();
   const { score, shots, baskets } = state.score;
   return (
@@ -126,6 +184,10 @@ export function ResultsOverlay({ state }: { state: GameState }) {
           <span>BEST STREAK</span>
         </div>
       </div>
+      {state.rank !== null && <p className="rank">#{state.rank} ON THE LEADERBOARD</p>}
+      {state.mode === 'live' && (
+        <LeaderboardList entries={leaderboard} highlight={state.nickname ?? undefined} />
+      )}
       <p className="tagline">NEXT PLAYER IN {secondsLeft(state.statusEndsAt, now)}s</p>
     </div>
   );

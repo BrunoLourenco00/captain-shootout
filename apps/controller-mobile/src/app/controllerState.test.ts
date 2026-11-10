@@ -24,9 +24,19 @@ function run(...actions: ControllerAction[]): ControllerState {
 }
 
 describe('controller screens', () => {
-  it('stays on the nickname screen until joined', () => {
-    expect(selectScreen(run())).toBe('nickname');
-    expect(selectScreen(run({ type: 'JOIN_REQUESTED' }))).toBe('nickname');
+  it('checks for a previous join first, then asks for a nickname', () => {
+    expect(selectScreen(run())).toBe('waiting');
+    expect(selectScreen(run({ type: 'RESUME_FAILED' }))).toBe('nickname');
+    expect(selectScreen(run({ type: 'RESUME_FAILED' }, { type: 'JOIN_REQUESTED' }))).toBe(
+      'nickname',
+    );
+  });
+
+  it('a resumed device goes straight to the game', () => {
+    const s = run({ type: 'JOINED' }, { type: 'VIEW', view: view('playing') });
+    expect(selectScreen(s)).toBe('playing');
+    // A late RESUME_FAILED cannot kick a joined player back to the form.
+    expect(selectScreen(controllerReducer(s, { type: 'RESUME_FAILED' }))).toBe('playing');
   });
 
   it('returns to the nickname screen with an error when joining fails', () => {

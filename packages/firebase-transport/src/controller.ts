@@ -10,6 +10,7 @@ import { signInAnonymously } from 'firebase/auth';
 import { get, onDisconnect, onValue, ref, set, type Unsubscribe } from 'firebase/database';
 import { getFirebase, type FirebaseSettings } from './firebase';
 import {
+  HEARTBEAT_STALE_MS,
   controllerPath,
   presencePath,
   publicPath,
@@ -35,16 +36,59 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
   let sessionId: string | null = null;
   let nickname = '';
   let lastView: ControllerView | null = null;
+  let presence: ReturnType<typeof ref> | null = null;
   const unsubscribers: Unsubscribe[] = [];
+
+  /** Session over: stop presence so a late onDisconnect doesn't recreate a removed session. */
+  function release() {
+    for (const unsubscribe of unsubscribers.splice(0)) unsubscribe();
+    if (presence)
+      void onDisconnect(presence)
+        .cancel()
+        .catch(() => {});
+    presence = null;
+  }
+
+  function emitClosed() {
+    release();
+    handlers?.onView({ ...CLOSED_VIEW, nickname });
+  }
 
   async function uid(): Promise<string> {
     return auth.currentUser?.uid ?? (await signInAnonymously(auth)).user.uid;
+  }
+
+  /** RTDB omits null fields; restore the full shape the UI expects. */
+  function normalizeView(raw: Partial<ControllerView>): ControllerView {
+    return {
+      ...CLOSED_VIEW,
+      nickname,
+      ...raw,
+      lastShot: raw.lastShot ?? null,
+      results: raw.results ?? null,
+    };
+  }
+
+  /** Server-corrected clock. `.info/*` paths cannot be read with get(), only listened to. */
+  function serverNow(): Promise<number> {
+    return new Promise((resolve) => {
+      onValue(
+        ref(db, '.info/serverTimeOffset'),
+        (snap) => {
+          const offset: unknown = snap.val();
+          resolve(Date.now() + (typeof offset === 'number' ? offset : 0));
+        },
+        () => resolve(Date.now()),
+        { onlyOnce: true },
+      );
+    });
   }
 
   /** Starts presence + view listeners once this device owns the session. */
   async function attach(id: string) {
     sessionId = id;
     const presenceRef = ref(db, presencePath(id));
+    presence = presenceRef;
     await onDisconnect(presenceRef).set(false);
     await set(presenceRef, true);
 
@@ -53,7 +97,7 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
         const online = snap.val() === true;
         handlers?.onConnection(online ? 'online' : 'reconnecting');
         // Re-announce presence after a reconnect (onDisconnect fired while offline).
-        if (online) {
+        if (online && presence) {
           void onDisconnect(presenceRef).set(false);
           void set(presenceRef, true).catch(() => {});
         }
@@ -61,16 +105,18 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
       onValue(
         ref(db, viewPath(id)),
         (snap) => {
-          const view = snap.val() as ControllerView | null;
-          if (view) {
+          const raw = snap.val() as Partial<ControllerView> | null;
+          if (raw) {
+            const view = normalizeView(raw);
             lastView = view;
-            handlers?.onView(view);
+            if (view.status === 'closed') emitClosed();
+            else handlers?.onView(view);
           } else if (lastView) {
-            handlers?.onView({ ...CLOSED_VIEW, nickname });
+            emitClosed();
           }
         },
         // Permission lost = the session was removed.
-        () => handlers?.onView({ ...CLOSED_VIEW, nickname }),
+        emitClosed,
       ),
     );
   }
@@ -85,6 +131,10 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
         if (!pub) return { ok: false, error: 'invalid_session' };
         if (pub.status === 'closed') return { ok: false, error: 'session_expired' };
         if (pub.status !== 'open') return { ok: false, error: 'session_busy' };
+        // An old QR (e.g. a photo) of a desktop that has since restarted.
+        if ((await serverNow()) - Number(pub.heartbeatAt ?? 0) > HEARTBEAT_STALE_MS) {
+          return { ok: false, error: 'session_expired' };
+        }
 
         const controller: SessionController = {
           uid: me,
@@ -143,7 +193,7 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
     },
 
     async leave() {
-      for (const unsubscribe of unsubscribers.splice(0)) unsubscribe();
+      release();
     },
   };
 }

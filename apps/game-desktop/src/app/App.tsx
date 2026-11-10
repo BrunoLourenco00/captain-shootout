@@ -13,19 +13,18 @@ import {
   ResultsOverlay,
 } from '../features/overlays/Overlays';
 import { GameScene } from '../game/scene/GameScene';
-import { createInitialState, makeGameReducer } from '../game/state/gameState';
+import { DEMO_SESSION_ID, createInitialState, makeGameReducer } from '../game/state/gameState';
 import { useDemoInput } from '../input/useDemoInput';
 import { useOperatorKeys } from '../input/useOperatorKeys';
-import { createSessionId } from './session';
+import { useHostSession } from '../services/useHostSession';
 
 const config = DEFAULT_GAME_CONFIG;
 const gameReducer = makeGameReducer(config);
 const TICK_MS = 100;
 
 export function App() {
-  const [state, dispatch] = useReducer(gameReducer, undefined, () =>
-    createInitialState(createSessionId()),
-  );
+  const [state, dispatch] = useReducer(gameReducer, undefined, () => createInitialState());
+  const host = useHostSession(state, dispatch, config);
 
   // The desktop owns the clock: every timed transition happens on TICK.
   useEffect(() => {
@@ -34,19 +33,23 @@ export function App() {
   }, []);
 
   useOperatorKeys({
-    onReset: useCallback(() => dispatch({ type: 'RESET', sessionId: createSessionId() }), []),
+    onReset: useCallback(() => dispatch({ type: 'RESET' }), []),
     onDemo: useCallback(() => dispatch({ type: 'DEMO_START', now: Date.now() }), []),
   });
 
-  const sessionId = state.sessionId;
   const fireDemoShot = useCallback(
     (shot: NormalizedSwipe) =>
       dispatch({
         type: 'SHOT',
         now: Date.now(),
-        command: { ...shot, sessionId, shotId: crypto.randomUUID(), clientTimestamp: Date.now() },
+        command: {
+          ...shot,
+          sessionId: DEMO_SESSION_ID,
+          shotId: crypto.randomUUID(),
+          clientTimestamp: Date.now(),
+        },
       }),
-    [sessionId],
+    [],
   );
   useDemoInput(state.mode === 'demo' && state.status === 'playing', config.gesture, fireDemoShot);
 
@@ -61,12 +64,15 @@ export function App() {
   return (
     <div className="stage">
       <GameScene balls={state.balls} onResolve={onResolve} onRemove={onRemove} />
-      {state.status === 'attract' && <AttractOverlay joinUrl={null} />}
+      {state.status === 'attract' && <AttractOverlay host={host} />}
       {state.status === 'connected' && <ConnectedOverlay nickname={state.nickname ?? ''} />}
       {state.status === 'countdown' && <CountdownOverlay endsAt={state.statusEndsAt} />}
       {inRound && <Hud state={state} config={config} />}
+      {!host.online && host.configured && <div className="net-badge">OFFLINE · RECONNECTING</div>}
       {inRound && <FeedbackPop feedback={state.feedback} />}
-      {state.status === 'results' && <ResultsOverlay state={state} />}
+      {state.status === 'results' && (
+        <ResultsOverlay state={state} leaderboard={host.leaderboard} />
+      )}
     </div>
   );
 }

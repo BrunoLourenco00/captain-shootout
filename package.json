@@ -9,6 +9,8 @@
   "scripts": {
     "dev:desktop": "pnpm --filter @captain/game-desktop dev",
     "dev:mobile": "pnpm --filter @captain/controller-mobile dev",
+    "dev:desktop:emulators": "pnpm --filter @captain/game-desktop dev:emulators",
+    "dev:mobile:emulators": "pnpm --filter @captain/controller-mobile dev:emulators",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",

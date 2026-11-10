@@ -54,11 +54,16 @@ function Controller({ params }: { params: JoinParams }) {
       onView: (view) => dispatch({ type: 'VIEW', view }),
       onConnection: (connection) => dispatch({ type: 'CONNECTION', state: connection }),
     });
+    // After a reload (or screen lock), rejoin the session this device already owns.
+    void transport
+      .resume(params)
+      .then((nickname) => dispatch(nickname ? { type: 'JOINED' } : { type: 'RESUME_FAILED' }))
+      .catch(() => dispatch({ type: 'RESUME_FAILED' }));
     return () => {
       unsubscribe();
       void transport.leave();
     };
-  }, [transport]);
+  }, [transport, params]);
 
   const join = useCallback(
     async (raw: string) => {
@@ -127,7 +132,11 @@ function Controller({ params }: { params: JoinParams }) {
           />
         );
       case 'waiting':
-        return <MessageScreen title="GET READY" body="Waiting for the game to start…" />;
+        return state.step === 'resuming' ? (
+          <MessageScreen title="CONNECTING…" body="Hang on a second." />
+        ) : (
+          <MessageScreen title="GET READY" body="Waiting for the game to start…" />
+        );
       case 'ready':
         return <ReadyScreen nickname={view?.nickname ?? ''} onReady={ready} />;
       case 'countdown':

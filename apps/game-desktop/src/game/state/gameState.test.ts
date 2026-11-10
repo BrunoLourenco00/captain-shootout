@@ -40,7 +40,8 @@ describe('state machine', () => {
     s = run(s, { type: 'TICK', now: 34_100 });
     expect(s.status).toBe('results');
     s = run(s, { type: 'TICK', now: 34_100 + 10_000 });
-    expect(s).toEqual(createInitialState(SESSION));
+    // Back to attract without a session: the app opens a new one (new QR).
+    expect(s).toEqual(createInitialState());
   });
 
   it('expires a joined player who never presses READY', () => {
@@ -67,8 +68,35 @@ describe('state machine', () => {
     expect(s).toMatchObject({ status: 'countdown', mode: 'demo', nickname: 'DEMO' });
   });
 
-  it('RESET returns to attract from anywhere', () => {
-    expect(run(playing(), { type: 'RESET', sessionId: 'S2' })).toEqual(createInitialState('S2'));
+  it('RESET returns to attract from anywhere and drops the session', () => {
+    expect(run(playing(), { type: 'RESET' })).toEqual(createInitialState());
+  });
+
+  it('a new session can only be attached while in attract', () => {
+    expect(run(createInitialState(), { type: 'SESSION_OPENED', sessionId: 'S9' }).sessionId).toBe(
+      'S9',
+    );
+    expect(run(playing(), { type: 'SESSION_OPENED', sessionId: 'S9' }).sessionId).toBe(SESSION);
+  });
+
+  it('nobody can join while no session is open', () => {
+    const s = createInitialState();
+    expect(run(s, { type: 'PLAYER_JOINED', sessionId: 'S1', nickname: 'X', now: 0 })).toBe(s);
+  });
+
+  it('a phone disconnect does not stop the round', () => {
+    let s = run(playing(), { type: 'CONTROLLER_PRESENCE', connected: false });
+    expect(s).toMatchObject({ status: 'playing', controllerConnected: false });
+    s = run(s, { type: 'CONTROLLER_PRESENCE', connected: true });
+    expect(s.controllerConnected).toBe(true);
+  });
+
+  it('stores the leaderboard rank only on the results screen', () => {
+    let s = run(playing(), { type: 'TICK', now: 33_000 }, { type: 'TICK', now: 33_001 });
+    expect(s.status).toBe('results');
+    s = run(s, { type: 'RESULT_SAVED', rank: 4 });
+    expect(s.rank).toBe(4);
+    expect(run(playing(), { type: 'RESULT_SAVED', rank: 1 }).rank).toBeNull();
   });
 });
 

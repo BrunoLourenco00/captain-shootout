@@ -2,7 +2,7 @@
  * Realtime Database layout (see database.rules.json):
  *
  * sessions/{sessionId}/
- *   public      { status: 'open'|'taken'|'closed', hostUid, createdAt }  readable by anyone
+ *   public      { status, hostUid, createdAt, heartbeatAt }               readable by anyone
  *   secret      { token }                                                readable by nobody
  *   controller  { uid, nickname, token, joinedAt }                       written once by the phone
  *   presence    { controller: boolean }                                  phone, onDisconnect → false
@@ -24,7 +24,13 @@ export interface SessionPublic {
   status: SessionPublicStatus;
   hostUid: string;
   createdAt: number;
+  /** Server time of the host's last heartbeat; a stale value means the desktop is gone. */
+  heartbeatAt: number;
 }
+
+export const HEARTBEAT_INTERVAL_MS = 30_000;
+/** A phone refuses sessions whose host has been silent for longer than this. */
+export const HEARTBEAT_STALE_MS = 90_000;
 
 export interface SessionController {
   uid: string;
