@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "demo-captain-shootout"
+    "default": "demo-captain-shootout",
+    "prod": "captain-shootout"
   }
 }

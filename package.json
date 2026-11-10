@@ -19,8 +19,9 @@
     "format:check": "prettier --check .",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "emulators": "firebase emulators:start --project demo-captain-shootout",
-    "deploy:controller": "pnpm --filter @captain/controller-mobile build && firebase deploy --only hosting",
-    "deploy:rules": "firebase deploy --only database,firestore"
+    "deploy:controller": "pnpm --filter @captain/controller-mobile build && firebase deploy --project prod --only hosting",
+    "deploy:rules": "firebase deploy --project prod --only database,firestore",
+    "kiosk": "pnpm --filter @captain/game-desktop build && pnpm --filter @captain/game-desktop exec vite preview --port 5173 --strictPort"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
