@@ -14,11 +14,13 @@
 ## 2. Proposed technology stack
 
 ### Monorepo
+
 - `pnpm` workspaces
 - TypeScript
 - Shared linting, formatting and type-checking configuration
 
 ### Desktop game
+
 - React
 - Vite
 - TypeScript
@@ -27,6 +29,7 @@
 - Rapier physics (`@react-three/rapier` or the appropriate Rapier integration)
 
 ### Mobile controller
+
 - React
 - Vite
 - TypeScript
@@ -34,6 +37,7 @@
 - Pointer Events for swipe input
 
 ### Initial backend / persistence proposal
+
 - Firebase Realtime Database for session state and short-lived commands.
 - Cloud Firestore for completed game results and leaderboard data.
 - Firebase Hosting for the web applications.
@@ -80,6 +84,7 @@ This is a proposed structure, not a requirement to create every package immediat
 ## 4. Runtime responsibilities
 
 ### Desktop
+
 - Creates a game session.
 - Displays the session QR code.
 - Accepts one controller for that session.
@@ -92,6 +97,7 @@ This is a proposed structure, not a requirement to create every package immediat
 - Resets to attract mode.
 
 ### Mobile
+
 - Reads session identifier/token from the join URL.
 - Collects nickname.
 - Connects to the active session.
@@ -102,6 +108,7 @@ This is a proposed structure, not a requirement to create every package immediat
 - Reconnects safely when possible.
 
 ### Backend / transport
+
 - Relays session and controller events.
 - Stores or relays short-lived commands.
 - Persists final results and leaderboard records through trusted writes.
@@ -117,10 +124,7 @@ interface GameTransport {
   joinSession(sessionId: string, token: string, nickname: string): Promise<void>;
   setReady(sessionId: string): Promise<void>;
   sendShot(command: ShotCommand): Promise<void>;
-  subscribeToSession(
-    sessionId: string,
-    handlers: SessionEventHandlers
-  ): () => void;
+  subscribeToSession(sessionId: string, handlers: SessionEventHandlers): () => void;
   close(): Promise<void>;
 }
 ```
@@ -128,6 +132,7 @@ interface GameTransport {
 Adapt the interface to the actual chosen transport. Do not let React components call Firebase APIs directly throughout the application.
 
 ### Event flow
+
 1. Desktop creates a session with a random identifier and short-lived join token.
 2. Desktop renders a QR URL such as `https://trycaptain.app/play/ABC123?token=...`.
 3. Mobile joins the session and submits a nickname.
@@ -148,13 +153,7 @@ Keep shared contracts in `packages/shared-types` or `packages/game-protocol`.
 Illustrative TypeScript types:
 
 ```ts
-type GameStatus =
-  | "waiting"
-  | "connected"
-  | "ready"
-  | "countdown"
-  | "playing"
-  | "finished";
+type GameStatus = 'waiting' | 'connected' | 'ready' | 'countdown' | 'playing' | 'finished';
 
 interface GameSession {
   sessionId: string;
@@ -183,13 +182,13 @@ interface ShotCommand {
   shotId: string;
   directionX: number; // -1..1
   directionY: number; // documented normalized convention
-  power: number;      // 0..1
+  power: number; // 0..1
   clientTimestamp: number;
 }
 
 interface ShotResult {
   shotId: string;
-  outcome: "perfect" | "scored" | "missed";
+  outcome: 'perfect' | 'scored' | 'missed';
   points: number;
   scoreAfterShot: number;
 }
@@ -218,6 +217,7 @@ A client-side desktop is authoritative for the booth experience, but it is not a
 ## 8. Physics and basket detection
 
 ### Scene
+
 - Fixed first-person PerspectiveCamera near the free-throw line.
 - Camera looks toward the hoop.
 - Static court, backboard and rim colliders.
@@ -226,24 +226,23 @@ A client-side desktop is authoritative for the booth experience, but it is not a
 - Lighting and restrained effects.
 
 ### Launch
+
 Convert normalized direction and power into an initial velocity. The following is only an illustrative starting point; values must be calibrated against the chosen scene scale and camera:
 
 ```ts
-function calculateShotVelocity(
-  directionX: number,
-  directionY: number,
-  power: number
-) {
+function calculateShotVelocity(directionX: number, directionY: number, power: number) {
   return {
     x: directionX * 2.5,
     y: 4 + power * 5,
-    z: -(5 + power * 3)
+    z: -(5 + power * 3),
   };
 }
 ```
 
 ### Basket detection
+
 A basket should count only when:
+
 - The ball crosses the hoop scoring plane.
 - The ball is travelling downward.
 - The ball is within the valid scoring region.
@@ -256,21 +255,27 @@ Use collision/sensor events and a per-shot scoring guard. Test edge cases such a
 Build a transport interface so two options can be tested:
 
 ### Option A — Firebase
+
 Advantages:
+
 - Fast initial development.
 - Hosted infrastructure.
 - Straightforward phone-to-desktop connection over the internet.
 
 Risks:
+
 - Event Wi-Fi and internet may be congested or restricted.
 - Latency and reconnect behavior need real-world testing.
 
 ### Option B — Local WebSocket
+
 Advantages:
+
 - Can work on a dedicated local network without internet.
 - Potentially lower latency and more predictable control.
 
 Risks:
+
 - Phone and desktop must be on the same network.
 - Captive portals, device isolation and network configuration can cause problems.
 
@@ -305,6 +310,7 @@ Avoid storing unnecessary personal data. A nickname is sufficient for the public
 ## 12. Technical decisions to validate
 
 Before building the full game, prove:
+
 1. Three.js/R3F + Rapier can deliver the desired ball feel and basket detection.
 2. A mobile browser can connect and send commands reliably on the intended network.
 3. QR/session creation and expiry work correctly.

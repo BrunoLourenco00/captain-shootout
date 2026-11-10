@@ -13,6 +13,7 @@ CAPTAIN SHOOTOUT is a short basketball challenge. The main computer displays a f
 A round lasts **30 seconds**. The desktop renders the game and owns the authoritative game state and score. The phone sends shot inputs only.
 
 The experience should be:
+
 - Instantly understandable to someone walking past the booth.
 - Fast to join, ideally in under 15 seconds.
 - Competitive, with a visible leaderboard.
@@ -37,6 +38,7 @@ The experience should be:
 `ATTRACT -> WAITING_FOR_PLAYER -> CONNECTED -> READY -> COUNTDOWN -> PLAYING -> FINISHED -> RESULTS -> ATTRACT`
 
 Include safe transitions for:
+
 - Controller disconnected during play.
 - Session timeout before the game starts.
 - Invalid, duplicated or late shot commands.
@@ -61,6 +63,7 @@ Scoring values and any bonus/streak rules should be configurable rather than har
 ### Mobile gesture
 
 Use a fixed-origin swipe area:
+
 - Swipe upward to shoot.
 - Horizontal displacement controls left/right aim.
 - Vertical displacement and/or gesture velocity controls shot power.
@@ -71,6 +74,7 @@ Use a fixed-origin swipe area:
 Use Pointer Events rather than separate mouse/touch implementations. Apply `touch-action: none` only to the gameplay control area so the rest of the page remains usable.
 
 Suggested normalized command:
+
 - `directionX`: -1 to 1
 - `directionY`: normalized vertical gesture component, with documented sign convention
 - `power`: 0 to 1
@@ -82,6 +86,7 @@ The exact gesture mapping must be calibrated with real users. Avoid making the c
 ### Desktop feedback
 
 On each accepted shot:
+
 - Spawn or activate a ball.
 - Apply the calculated initial velocity.
 - Show immediate feedback such as “SHOT!”, “SCORE!” or “MISS”.
@@ -93,6 +98,7 @@ On each accepted shot:
 The desktop is the public-facing display and should work in full-screen kiosk mode.
 
 ### Attract mode
+
 - CAPTAIN logo/wordmark.
 - First-person 3D court and visible hoop.
 - Large QR code and “SCAN TO PLAY” call to action.
@@ -100,12 +106,15 @@ The desktop is the public-facing display and should work in full-screen kiosk mo
 - Current high score or leaderboard teaser.
 
 ### Connected / ready
+
 - Show the player's nickname.
 - Confirm that the phone is connected.
 - Show countdown and a simple instruction.
 
 ### Gameplay HUD
+
 Keep the 3D court visually dominant. HUD may include:
+
 - Nickname.
 - Countdown timer.
 - Current score.
@@ -113,7 +122,9 @@ Keep the 3D court visually dominant. HUD may include:
 - Brief shot feedback.
 
 ### Results
+
 Show:
+
 - Final score.
 - Attempts and baskets.
 - Accuracy.
@@ -125,18 +136,21 @@ Show:
 Design mobile-first, portrait orientation.
 
 ### Connect screen
+
 - CAPTAIN branding.
 - Nickname input.
 - Connection status.
 - Clear join/continue action.
 
 ### Ready screen
+
 - Player nickname.
 - Short gesture instructions.
 - READY action.
 - Connection indicator.
 
 ### Controller screen
+
 - Large, thumb-friendly swipe surface.
 - Minimal interface; avoid small controls.
 - Clear indication of remaining time and/or score if useful.
@@ -148,6 +162,7 @@ Do not require account creation for the booth MVP. Avoid collecting unnecessary 
 ## 7. Visual direction
 
 Use CAPTAIN's existing visual identity:
+
 - Primary blue: `#1668D6`
 - Dark background/text: `#0B1220`
 - Light background: `#F7F9FB`
@@ -159,6 +174,7 @@ The 3D environment should feel like a polished sports-performance experience, no
 ## 8. MVP scope
 
 ### Must have
+
 - Desktop attract mode and first-person 3D court.
 - Dynamic session and QR code.
 - Mobile browser controller.
@@ -173,6 +189,7 @@ The 3D environment should feel like a polished sports-performance experience, no
 - Disconnect and timeout handling.
 
 ### Should have
+
 - Sound effects and subtle visual effects.
 - Streak/bonus scoring.
 - Personal best.
@@ -180,6 +197,7 @@ The 3D environment should feel like a polished sports-performance experience, no
 - Basic event analytics.
 
 ### Defer until core gameplay is stable
+
 - Complex aim preview or trajectory assistance.
 - Multiple game modes.
 - User accounts and profiles.
@@ -190,6 +208,7 @@ The 3D environment should feel like a polished sports-performance experience, no
 ## 9. Acceptance criteria
 
 The MVP is ready for a booth test when:
+
 1. Desktop launches in full-screen attract mode.
 2. Desktop displays a valid, scannable QR code.
 3. A phone can open the controller page and join the correct session.
@@ -206,6 +225,7 @@ The MVP is ready for a booth test when:
 ## 10. Event constraints
 
 Assume the booth environment may have:
+
 - Unreliable or congested Wi-Fi.
 - Many nearby devices and networks.
 - Visitors who abandon the game mid-round.
