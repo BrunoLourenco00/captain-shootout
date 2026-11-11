@@ -337,8 +337,10 @@ body,
   --tier: var(--r-glow);
   justify-content: flex-start;
   align-items: stretch;
-  gap: 16px;
-  padding: max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom));
+  /* One screen on most phones: spacing, score and helix follow the screen height. */
+  gap: clamp(10px, 2dvh, 18px);
+  padding: max(clamp(12px, 2dvh, 20px), env(safe-area-inset-top)) 12px
+    max(clamp(12px, 2dvh, 20px), env(safe-area-inset-bottom));
   overflow-x: clip;
   font-family: 'Barlow', 'Inter', system-ui, sans-serif;
   color: var(--r-fg);
@@ -422,7 +424,7 @@ body,
 
 .final {
   font-family: var(--display);
-  font-size: 112px;
+  font-size: clamp(80px, 14dvh, 120px);
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -459,7 +461,7 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
+  padding: clamp(7px, 1.2dvh, 10px) 0;
   border-radius: 16px;
   border: 1px solid var(--r-line);
   background: color-mix(in oklab, var(--r-card) 70%, transparent);
@@ -481,7 +483,7 @@ body,
 
 /* Player DNA */
 .dna-card {
-  padding: 16px;
+  padding: clamp(12px, 2dvh, 16px) 16px;
   border-radius: 24px;
   border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
   background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
@@ -516,7 +518,7 @@ body,
 .dna-helix {
   display: block;
   width: 100%;
-  height: 80px;
+  height: clamp(44px, 8dvh, 72px);
 }
 
 .dna-helix .rung {
@@ -545,7 +547,7 @@ body,
   margin: 4px 0 0;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: clamp(6px, 1dvh, 9px);
 }
 
 .dna-bars li {
@@ -592,7 +594,7 @@ body,
 }
 
 .dna-gene {
-  margin: 12px 0 0;
+  margin: clamp(8px, 1.5dvh, 12px) 0 0;
   padding: 12px;
   border-radius: 12px;
   background: color-mix(in oklab, var(--r-accent) 10%, transparent);
@@ -604,59 +606,8 @@ body,
   color: var(--r-accent);
 }
 
-/* AI Coach closer */
-.coach-closer {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.coach-closer h2 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1.25;
-}
-
-.coach-closer h2 span {
-  display: block;
-  color: var(--r-glow);
-}
-
-.coach-closer p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.43;
-  color: var(--r-muted);
-}
-
-.coach-cta {
-  display: block;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: var(--r-gradient);
-  box-shadow: var(--r-shadow);
-  color: var(--light);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  text-decoration: none;
-  transition: transform 0.15s;
-}
-
-.coach-cta:active {
-  transform: scale(0.95);
-}
-
-.coach-closer small {
-  font-size: 12px;
-  color: var(--r-muted);
-}
-
 .results-footer {
-  margin: 0;
+  margin: auto 0 0;
   padding-top: 12px;
   border-top: 1px solid var(--r-line);
   font-size: 12px;
@@ -675,7 +626,7 @@ body,
   }
 
   .final {
-    font-size: 128px;
+    font-size: clamp(96px, 15dvh, 128px);
   }
 
   .results-points {
@@ -699,18 +650,8 @@ body,
     font-size: 24px;
   }
 
-  .dna-gene,
-  .coach-closer p {
+  .dna-gene {
     font-size: 14px;
-  }
-
-  .coach-closer h2 {
-    font-size: 30px;
-  }
-
-  .coach-cta {
-    font-size: 16px;
-    letter-spacing: 0.1em;
   }
 }
 

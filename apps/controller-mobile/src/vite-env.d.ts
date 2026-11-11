@@ -8,8 +8,6 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_APP_ID?: string;
   readonly VITE_FIREBASE_USE_EMULATORS?: string;
   readonly VITE_FIREBASE_EMULATOR_HOST?: string;
-  /** "Unlock my full DNA" (AI Coach) link on the results screen (default https://trycaptain.app). */
-  readonly VITE_COACH_URL?: string;
 }
 
 // Fontsource CSS entry points imported for their side effect (e.g. '.../latin-800').

@@ -1,9 +1,6 @@
 import {
-  COACH_CLOSER,
-  COACH_CTA,
   DNA_LABELS,
   DNA_ORDER,
-  coachLink,
   geneToUnlock,
   roundVerdict,
   type PlayerDna,
@@ -248,7 +245,6 @@ export function ResultsScreen({
       )}
 
       {r?.dna && <DnaCard dna={r.dna} />}
-      <CoachCloser />
 
       <p className="results-footer">
         {sessionClosed
@@ -345,24 +341,4 @@ function useCountUp(target: number, durationMs = 900): number {
     return () => cancelAnimationFrame(id);
   }, [target, durationMs]);
   return value;
-}
-
-/** Where "Unlock my full DNA" leads (CAPTAIN app page). Overridable per deploy. */
-const COACH_URL = import.meta.env.VITE_COACH_URL || 'https://trycaptain.app';
-
-/** Closing pitch for the AI Coach in the CAPTAIN app. */
-function CoachCloser() {
-  return (
-    <section className="coach-closer" aria-label="AI Coach">
-      <h2>
-        {COACH_CLOSER.headline}
-        <span>{COACH_CLOSER.highlight}</span>
-      </h2>
-      <p>{COACH_CLOSER.body}</p>
-      <a className="coach-cta" href={coachLink(COACH_URL)} target="_blank" rel="noreferrer">
-        {COACH_CTA} <span aria-hidden>→</span>
-      </a>
-      <small>{COACH_CLOSER.fineprint}</small>
-    </section>
-  );
 }
