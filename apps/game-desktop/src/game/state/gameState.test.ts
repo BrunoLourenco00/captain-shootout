@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { createInitialState, makeGameReducer, type GameAction, type GameState } from './gameState';
 
 const config = DEFAULT_GAME_CONFIG;
+/** Countdown 0-3 s, then the round. */
+const ROUND_END = 3000 + config.roundDurationMs;
 const reduce = makeGameReducer(config);
 const SESSION = 'S1';
 
@@ -14,7 +16,7 @@ function shot(shotId: string, sessionId = SESSION): ShotCommand {
   return { sessionId, shotId, directionX: 0, directionY: 0.5, power: 0.5, clientTimestamp: 0 };
 }
 
-/** A live round that is PLAYING; the round started at t=3000 and ends at t=33000. */
+/** A live round that is PLAYING; the round started at t=3000 and ends at ROUND_END. */
 function playing(): GameState {
   return run(
     createInitialState(SESSION),
@@ -35,11 +37,11 @@ describe('state machine', () => {
     expect(s.status).toBe('countdown');
     s = run(s, { type: 'TICK', now: 4000 });
     expect(s.status).toBe('playing');
-    s = run(s, { type: 'TICK', now: 4000 + 30_000 });
+    s = run(s, { type: 'TICK', now: 4000 + config.roundDurationMs });
     expect(s.status).toBe('finished');
-    s = run(s, { type: 'TICK', now: 34_100 });
+    s = run(s, { type: 'TICK', now: 4000 + config.roundDurationMs + 100 });
     expect(s.status).toBe('results');
-    s = run(s, { type: 'TICK', now: 34_100 + 10_000 });
+    s = run(s, { type: 'TICK', now: 4000 + config.roundDurationMs + 100 + 10_000 });
     // Back to attract without a session: the app opens a new one (new QR).
     expect(s).toEqual(createInitialState());
   });
@@ -92,7 +94,7 @@ describe('state machine', () => {
   });
 
   it('stores the leaderboard rank only on the results screen', () => {
-    let s = run(playing(), { type: 'TICK', now: 33_000 }, { type: 'TICK', now: 33_001 });
+    let s = run(playing(), { type: 'TICK', now: ROUND_END }, { type: 'TICK', now: ROUND_END + 1 });
     expect(s.status).toBe('results');
     s = run(s, { type: 'RESULT_SAVED', rank: 4 });
     expect(s.rank).toBe(4);
@@ -145,7 +147,7 @@ describe('shots', () => {
 
   it('rejects a late shot that arrives before the buzzer tick', () => {
     const s = playing();
-    expect(run(s, { type: 'SHOT', command: shot('a'), now: 33_000 })).toBe(s);
+    expect(run(s, { type: 'SHOT', command: shot('a'), now: ROUND_END })).toBe(s);
   });
 });
 
@@ -180,22 +182,22 @@ describe('resolution', () => {
   it('a ball in the air at the buzzer can still score during the grace window', () => {
     let s = run(
       playing(),
-      { type: 'SHOT', command: shot('a'), now: 32_900 },
-      { type: 'TICK', now: 33_000 },
+      { type: 'SHOT', command: shot('a'), now: ROUND_END - 100 },
+      { type: 'TICK', now: ROUND_END },
     );
     expect(s.status).toBe('finished');
     s = run(s, { type: 'SHOT_RESOLVED', shotId: 'a', outcome: 'perfect' });
     expect(s.score.score).toBe(3);
-    s = run(s, { type: 'TICK', now: 33_100 });
+    s = run(s, { type: 'TICK', now: ROUND_END + 100 });
     expect(s.status).toBe('results');
   });
 
   it('unresolved balls at the end of the grace window count as misses', () => {
     const s = run(
       playing(),
-      { type: 'SHOT', command: shot('a'), now: 32_900 },
-      { type: 'TICK', now: 33_000 },
-      { type: 'TICK', now: 33_000 + config.buzzerGraceMs },
+      { type: 'SHOT', command: shot('a'), now: ROUND_END - 100 },
+      { type: 'TICK', now: ROUND_END },
+      { type: 'TICK', now: ROUND_END + config.buzzerGraceMs },
     );
     expect(s.status).toBe('results');
     expect(s.score).toMatchObject({ shots: 1, baskets: 0 });

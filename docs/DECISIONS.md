@@ -46,7 +46,7 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 
 | Setting                      | Value                            |
 | ---------------------------- | -------------------------------- |
-| Round duration               | 30 s                             |
+| Round duration               | 45 s (was 30 s until 2026-11-11) |
 | Countdown                    | 3 s                              |
 | Waiting for READY after join | 60 s, then back to attract       |
 | Results screen               | 10 s, then attract with a new QR |

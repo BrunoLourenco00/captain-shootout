@@ -71,7 +71,7 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
         <div>
           <h1 className="cta">SCAN TO PLAY</h1>
           <p className="tagline">Scan. Swipe. Score.</p>
-          <p className="muted">30 seconds. Swipe up on your phone to shoot.</p>
+          <p className="muted">45 seconds. Swipe up on your phone to shoot.</p>
         </div>
         {host.leaderboard.length > 0 && (
           <div className="attract-board">

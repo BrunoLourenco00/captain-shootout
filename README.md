@@ -1,6 +1,6 @@
 # CAPTAIN SHOOTOUT
 
-First-person 3D basketball shooting game for the CAPTAIN booth. The desktop shows the court; the player scans a QR code and uses their phone as a controller, swiping up to shoot. 30-second rounds.
+First-person 3D basketball shooting game for the CAPTAIN booth. The desktop shows the court; the player scans a QR code and uses their phone as a controller, swiping up to shoot. 45-second rounds.
 
 Product and technical docs live in [`docs/`](docs/). **[`docs/DECISIONS.md`](docs/DECISIONS.md) wins over the other docs.**
 

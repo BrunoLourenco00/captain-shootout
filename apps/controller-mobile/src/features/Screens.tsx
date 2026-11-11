@@ -102,7 +102,7 @@ function HowToPlay() {
         <strong>Swipe up</strong> to shoot. Not too short, not too long: find the sweet spot.
       </li>
       <li>Swipe a little left or right to aim.</li>
-      <li>30 seconds. Score as much as you can!</li>
+      <li>45 seconds. Score as much as you can!</li>
     </ol>
   );
 }

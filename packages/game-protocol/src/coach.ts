@@ -9,7 +9,7 @@ export interface CoachPitch {
 
 export const COACH_CTA = 'TRAIN WITH COACH CAP';
 
-/** Score thresholds for the pitch tone; on a 30-second round 30+ is a strong round. */
+/** Score thresholds for the pitch tone; on a 45-second round 30+ is a strong round. */
 const STRONG_ROUND = 30;
 const DECENT_ROUND = 12;
 

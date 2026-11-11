@@ -51,7 +51,7 @@ export interface LevelConfig {
 }
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
-  roundDurationMs: 30_000,
+  roundDurationMs: 45_000,
   countdownMs: 3_000,
   readyTimeoutMs: 60_000,
   resultsDurationMs: 10_000,
