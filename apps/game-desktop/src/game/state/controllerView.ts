@@ -1,5 +1,5 @@
 import type { ControllerStatus, ControllerView, GameConfig } from '@captain/game-protocol';
-import { accuracy, isOnFire } from '../scoring/scoring';
+import { accuracy, isOnFire, nextMultiplier } from '../scoring/scoring';
 import type { GameState } from './gameState';
 
 function secondsUntil(deadline: number | null, now: number): number {
@@ -28,6 +28,7 @@ export function toControllerView(
       state.status === 'countdown' || state.status === 'playing' ? secondsUntil(deadline, now) : 0,
     score: state.score.score,
     onFire: isOnFire(state.score, config.scoring),
+    multiplier: nextMultiplier(state.score, config.scoring),
     lastShot: feedback
       ? {
           shotId: feedback.shotId,

@@ -6,12 +6,16 @@ import { CanvasTexture, SRGBColorSpace } from 'three';
 import { BRAND } from '../../app/brand';
 import { crossedHoopDownward } from '../physics/basketDetection';
 import { BALL_RADIUS, HOOP, LAUNCH_POSITION, type Vec3 } from '../physics/courtGeometry';
+import { liveHoopCenter } from '../physics/liveHoop';
 import { calculateShotVelocity } from '../physics/shotVelocity';
 import type { ActiveBall } from '../state/gameState';
 import { RIM_BODY_NAME } from './Hoop';
 
-/** Ball centre must cross the rim plane within this horizontal distance of the rim centre. */
-const SCORING_ZONE = { center: HOOP.center, radius: HOOP.rimRadius - BALL_RADIUS * 0.4 };
+/**
+ * Ball centre must cross the rim plane within this horizontal distance of the rim centre.
+ * The centre is the live one: the hoop moves at higher levels.
+ */
+const SCORING_ZONE = { center: liveHoopCenter, radius: HOOP.rimRadius - BALL_RADIUS * 0.4 };
 /** A ball that touches the floor before scoring is a miss. */
 const FLOOR_MISS_Y = BALL_RADIUS + 0.03;
 /** Keep the ball in the scene for a moment after it resolves, then remove it. */

@@ -1,4 +1,9 @@
-import type { GameConfig, ShotOutcome } from '@captain/game-protocol';
+import {
+  basketPoints,
+  streakMultiplier,
+  type GameConfig,
+  type ShotOutcome,
+} from '@captain/game-protocol';
 
 export interface ScoreState {
   score: number;
@@ -19,20 +24,13 @@ export const EMPTY_SCORE: ScoreState = {
   bestStreak: 0,
 };
 
-/** Points a basket is worth given how many consecutive baskets it completes. */
-export function pointsFor(
-  outcome: ShotOutcome,
-  streakIncludingThis: number,
-  scoring: GameConfig['scoring'],
-): number {
-  if (outcome === 'missed') return 0;
-  const base = outcome === 'perfect' ? scoring.perfectPoints : scoring.basketPoints;
-  return streakIncludingThis >= scoring.streakThreshold ? base * scoring.streakMultiplier : base;
+/** Multiplier the *next* basket gets from the current streak (1 = none). */
+export function nextMultiplier(score: ScoreState, scoring: GameConfig['scoring']): number {
+  return streakMultiplier(score.streak + 1, scoring.streakTiers);
 }
 
 export function isOnFire(score: ScoreState, scoring: GameConfig['scoring']): boolean {
-  // The *next* basket will be multiplied.
-  return score.streak + 1 >= scoring.streakThreshold;
+  return nextMultiplier(score, scoring) > 1;
 }
 
 export function recordAttempt(state: ScoreState): ScoreState {
@@ -48,7 +46,7 @@ export function applyOutcome(
     return { state: { ...state, streak: 0 }, points: 0 };
   }
   const streak = state.streak + 1;
-  const points = pointsFor(outcome, streak, scoring);
+  const points = basketPoints(outcome, streak, scoring);
   return {
     points,
     state: {

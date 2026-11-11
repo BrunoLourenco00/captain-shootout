@@ -10,9 +10,13 @@ import {
   CountdownOverlay,
   FeedbackPop,
   Hud,
+  LevelUpFlash,
   ResultsOverlay,
+  StreakBanner,
 } from '../features/overlays/Overlays';
 import { GameScene } from '../game/scene/GameScene';
+import { levelFor } from '../game/scoring/levels';
+import { isOnFire } from '../game/scoring/scoring';
 import { DEMO_SESSION_ID, createInitialState, makeGameReducer } from '../game/state/gameState';
 import { useDemoInput } from '../input/useDemoInput';
 import { useOperatorKeys } from '../input/useOperatorKeys';
@@ -60,16 +64,32 @@ export function App() {
   const onRemove = useCallback((shotId: string) => dispatch({ type: 'BALL_REMOVED', shotId }), []);
 
   const inRound = state.status === 'playing' || state.status === 'finished';
+  const roundActive = state.status === 'countdown' || inRound;
+  const basketSeq = state.feedback && state.feedback.outcome !== 'missed' ? state.feedback.seq : 0;
+  const perfectSeq = state.feedback?.outcome === 'perfect' ? state.feedback.seq : 0;
 
   return (
     <div className="stage">
-      <GameScene balls={state.balls} onResolve={onResolve} onRemove={onRemove} />
+      <GameScene
+        balls={state.balls}
+        onResolve={onResolve}
+        onRemove={onRemove}
+        roundActive={roundActive}
+        hoopMotion={levelFor(state.score.score, config.levels)}
+        onFire={inRound && isOnFire(state.score, config.scoring)}
+        basketSeq={basketSeq}
+        perfectSeq={perfectSeq}
+      />
       {state.status === 'attract' && <AttractOverlay host={host} />}
       {state.status === 'connected' && <ConnectedOverlay nickname={state.nickname ?? ''} />}
       {state.status === 'countdown' && <CountdownOverlay endsAt={state.statusEndsAt} />}
       {inRound && <Hud state={state} config={config} />}
       {!host.online && host.configured && <div className="net-badge">OFFLINE · RECONNECTING</div>}
-      {inRound && <FeedbackPop feedback={state.feedback} />}
+      {/* A level-up has its own big message: it replaces the shot pop for that basket. */}
+      {inRound && !state.feedback?.levelUp && <FeedbackPop feedback={state.feedback} />}
+      {inRound && <LevelUpFlash feedback={state.feedback} />}
+      {/* A level-up flash wins over the streak banner if both happen on one basket. */}
+      {inRound && !state.feedback?.levelUp && <StreakBanner feedback={state.feedback} />}
       {state.status === 'results' && (
         <ResultsOverlay state={state} leaderboard={host.leaderboard} />
       )}

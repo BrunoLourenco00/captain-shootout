@@ -31,9 +31,13 @@ export const BACKBOARD = {
 export const LAUNCH_POSITION: Vec3 = { x: 0, y: 1.55, z: -0.35 };
 
 export const CAMERA = {
-  position: [0, 1.75, 0.6] as [number, number, number],
-  lookAt: [0, 2.55, -4.2] as [number, number, number],
-  fov: 50,
+  // A little above eye height and aimed below the rim, so the floor, the key and the
+  // courtside boards stay in view on a 16:9 screen (purely visual: shots launch from
+  // LAUNCH_POSITION).
+  position: [0, 2.15, 0.9] as [number, number, number],
+  lookAt: [0, 2.45, -4.2] as [number, number, number],
+  // Wide enough to keep the top of the ball's arc in frame.
+  fov: 58,
 };
 
 export const GRAVITY = 9.81;

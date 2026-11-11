@@ -16,6 +16,11 @@ export interface ControllerState {
   connection: ConnectionState;
   readySent: boolean;
   lastShotAt: number | null;
+  /**
+   * The last view that carried round results. Kept after the desktop closes the
+   * session so the player can still read their result and open the Coach Cap link.
+   */
+  finalView: ControllerView | null;
 }
 
 export type ControllerAction =
@@ -35,6 +40,7 @@ export const INITIAL_CONTROLLER_STATE: ControllerState = {
   connection: 'online',
   readySent: false,
   lastShotAt: null,
+  finalView: null,
 };
 
 export function controllerReducer(
@@ -51,7 +57,12 @@ export function controllerReducer(
     case 'JOINED':
       return { ...state, step: 'joined', error: null };
     case 'VIEW':
-      return { ...state, view: action.view };
+      return {
+        ...state,
+        view: action.view,
+        finalView:
+          action.view.status === 'results' && action.view.results ? action.view : state.finalView,
+      };
     case 'CONNECTION':
       return { ...state, connection: action.state };
     case 'READY_SENT':
@@ -80,7 +91,7 @@ export function selectScreen(state: ControllerState): ControllerScreen {
     case 'results':
       return 'results';
     case 'closed':
-      return 'ended';
+      return state.finalView ? 'results' : 'ended';
   }
 }
 

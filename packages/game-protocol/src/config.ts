@@ -1,3 +1,5 @@
+import type { StreakTier } from './streak';
+
 /**
  * Tunable game settings. Everything the team may want to change on event day lives here.
  * See docs/DECISIONS.md for the agreed values.
@@ -16,10 +18,14 @@ export interface GameConfig {
     basketPoints: number;
     /** Basket without touching the rim. */
     perfectPoints: number;
-    /** The Nth consecutive basket (and every one after) is multiplied. */
-    streakThreshold: number;
-    streakMultiplier: number;
+    /** Consecutive-basket multipliers; the highest tier reached applies until a miss. */
+    streakTiers: StreakTier[];
   };
+  /**
+   * Difficulty by score: the hoop sways left/right (and later bobs) faster the better
+   * the player is doing. Sorted by minScore; the first level must start at 0.
+   */
+  levels: LevelConfig[];
   nickname: {
     minLength: number;
     maxLength: number;
@@ -34,8 +40,18 @@ export interface GameConfig {
   };
 }
 
+export interface LevelConfig {
+  minScore: number;
+  /** Left/right travel from the centre, in metres (0 = still). */
+  hoopSwayM: number;
+  /** Up/down travel from the regulation height, in metres. */
+  hoopBobM: number;
+  /** Time for one full left-right-left cycle. */
+  hoopPeriodMs: number;
+}
+
 export const DEFAULT_GAME_CONFIG: GameConfig = {
-  roundDurationMs: 30_000,
+  roundDurationMs: 45_000,
   countdownMs: 3_000,
   readyTimeoutMs: 60_000,
   resultsDurationMs: 10_000,
@@ -45,9 +61,17 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   scoring: {
     basketPoints: 2,
     perfectPoints: 3,
-    streakThreshold: 5,
-    streakMultiplier: 2,
+    streakTiers: [
+      { minStreak: 5, multiplier: 1.5 },
+      { minStreak: 10, multiplier: 2 },
+    ],
   },
+  levels: [
+    { minScore: 0, hoopSwayM: 0, hoopBobM: 0, hoopPeriodMs: 4_000 },
+    { minScore: 10, hoopSwayM: 0.35, hoopBobM: 0, hoopPeriodMs: 4_200 },
+    { minScore: 25, hoopSwayM: 0.6, hoopBobM: 0, hoopPeriodMs: 3_200 },
+    { minScore: 45, hoopSwayM: 0.75, hoopBobM: 0.12, hoopPeriodMs: 2_600 },
+  ],
   nickname: {
     minLength: 2,
     maxLength: 16,

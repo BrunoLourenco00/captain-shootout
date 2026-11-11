@@ -4,6 +4,8 @@ import { toControllerView } from './controllerView';
 import { createInitialState, makeGameReducer, type GameAction, type GameState } from './gameState';
 
 const config = DEFAULT_GAME_CONFIG;
+/** Countdown 0-3 s, then the round. */
+const ROUND_END = 3000 + config.roundDurationMs;
 const reduce = makeGameReducer(config);
 const run = (state: GameState, ...actions: GameAction[]) => actions.reduce(reduce, state);
 const shot = (shotId: string): ShotCommand => ({
@@ -38,8 +40,10 @@ describe('toControllerView', () => {
       nickname: 'ANA',
     });
     const playing = run(countdown, { type: 'TICK', now: 3000 });
-    expect(toControllerView(playing, 3000, config)?.secondsLeft).toBe(30);
-    expect(toControllerView(playing, 32_100, config)?.secondsLeft).toBe(1);
+    expect(toControllerView(playing, 3000, config)?.secondsLeft).toBe(
+      config.roundDurationMs / 1000,
+    );
+    expect(toControllerView(playing, ROUND_END - 900, config)?.secondsLeft).toBe(1);
   });
 
   it('reports the last resolved shot and the score', () => {
@@ -61,8 +65,8 @@ describe('toControllerView', () => {
       joined(),
       { type: 'PLAYER_READY', now: 0 },
       { type: 'TICK', now: 3000 },
-      { type: 'TICK', now: 33_000 },
-      { type: 'TICK', now: 33_001 },
+      { type: 'TICK', now: ROUND_END },
+      { type: 'TICK', now: ROUND_END + 1 },
       { type: 'RESULT_SAVED', rank: 2 },
     );
     expect(toControllerView(s, 34_000, config)).toMatchObject({

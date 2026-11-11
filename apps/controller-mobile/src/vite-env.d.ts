@@ -8,4 +8,6 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_APP_ID?: string;
   readonly VITE_FIREBASE_USE_EMULATORS?: string;
   readonly VITE_FIREBASE_EMULATOR_HOST?: string;
+  /** "Train with Coach Cap" link on the results screen (default https://trycaptain.app). */
+  readonly VITE_COACH_URL?: string;
 }

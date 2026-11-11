@@ -1,5 +1,13 @@
-import type { ControllerView, GameConfig, NormalizedSwipe } from '@captain/game-protocol';
-import { useState, type FormEvent } from 'react';
+import {
+  COACH_CTA,
+  coachLink,
+  coachPitch,
+  roundVerdict,
+  type ControllerView,
+  type GameConfig,
+  type NormalizedSwipe,
+} from '@captain/game-protocol';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useSwipe, type SwipeTrail } from '../gestures/useSwipe';
 
 export function Wordmark() {
@@ -94,7 +102,7 @@ function HowToPlay() {
         <strong>Swipe up</strong> to shoot. Not too short, not too long: find the sweet spot.
       </li>
       <li>Swipe a little left or right to aim.</li>
-      <li>30 seconds. Score as much as you can!</li>
+      <li>45 seconds. Score as much as you can!</li>
     </ol>
   );
 }
@@ -140,7 +148,7 @@ export function PlayScreen({
         <div className="right">
           <span className="label">SCORE</span>
           <strong>{view.score}</strong>
-          {view.onFire && <span className="fire">🔥 x2</span>}
+          {view.onFire && <span className="fire">🔥 x{view.multiplier ?? 2}</span>}
         </div>
       </header>
 
@@ -190,14 +198,39 @@ function TrailArrow({ trail }: { trail: SwipeTrail }) {
   );
 }
 
-export function ResultsScreen({ view }: { view: ControllerView }) {
+export function ResultsScreen({
+  view,
+  sessionClosed,
+}: {
+  view: ControllerView;
+  /** The desktop already moved on: the result stays here, the round is over. */
+  sessionClosed: boolean;
+}) {
   const r = view.results;
+  const score = r?.score ?? view.score;
+  const verdict = roundVerdict(r ?? { score, baskets: 0, shots: 0, accuracy: 0, rank: null });
+  const shown = useCountUp(score);
   return (
-    <main className="screen center">
-      <Wordmark />
-      <p className="label">{view.nickname}</p>
-      <div className="final">{r?.score ?? view.score}</div>
-      <p className="label">POINTS</p>
+    <main className={`screen results tier-${verdict.tier}`}>
+      <header className="results-head">
+        <img className="results-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
+        <span className="results-player">{view.nickname}</span>
+      </header>
+
+      <section className="results-hero" aria-label={`${score} points`}>
+        <span className="tier-badge">{verdict.title}</span>
+        <div className="final" aria-hidden>
+          {shown}
+        </div>
+        <p className="label">POINTS</p>
+        <p className="verdict-line">{verdict.line}</p>
+        {r?.rank != null && (
+          <p className="rank">
+            #{r.rank} <span>ON TODAY&apos;S LEADERBOARD</span>
+          </p>
+        )}
+      </section>
+
       {r && (
         <div className="stats">
           <div>
@@ -214,8 +247,52 @@ export function ResultsScreen({ view }: { view: ControllerView }) {
           </div>
         </div>
       )}
-      {r?.rank != null && <p className="rank">#{r.rank} ON THE LEADERBOARD</p>}
-      <p className="fineprint">📸 Take a screenshot to keep your score!</p>
+
+      <CoachCard score={score} />
+      <p className="fineprint">
+        {sessionClosed
+          ? 'Round over. Scan the new QR code on the big screen to play again.'
+          : '📸 Screenshot this to keep your score!'}
+      </p>
     </main>
+  );
+}
+
+/** Counts from 0 up to `target` once, for the score reveal. */
+function useCountUp(target: number, durationMs = 900): number {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      const id = requestAnimationFrame(() => setValue(target));
+      return () => cancelAnimationFrame(id);
+    }
+    const start = performance.now();
+    let id = 0;
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      setValue(Math.round(target * (1 - (1 - t) ** 3)));
+      if (t < 1) id = requestAnimationFrame(step);
+    };
+    id = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(id);
+  }, [target, durationMs]);
+  return value;
+}
+
+/** Where "Train with Coach Cap" leads (CAPTAIN app page). Overridable per deploy. */
+const COACH_URL = import.meta.env.VITE_COACH_URL || 'https://trycaptain.app';
+
+/** End-of-round pitch for Coach Cap, CAPTAIN's AI coach. */
+function CoachCard({ score }: { score: number }) {
+  const pitch = coachPitch(score);
+  return (
+    <section className="coach-card" aria-label="Coach Cap">
+      <span className="coach-kicker">AI COACH</span>
+      <h2>{pitch.headline}</h2>
+      <p>{pitch.body}</p>
+      <a className="coach-cta" href={coachLink(COACH_URL)} target="_blank" rel="noreferrer">
+        {COACH_CTA}
+      </a>
+    </section>
   );
 }
