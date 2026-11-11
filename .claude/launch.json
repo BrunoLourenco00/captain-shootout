@@ -1,0 +1,37 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "game-desktop",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev:desktop"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "controller-mobile",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev:mobile"
+      ],
+      "port": 5174
+    },
+    {
+      "name": "game-desktop-emulators",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev:desktop:emulators"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "controller-mobile-emulators",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev:mobile:emulators"
+      ],
+      "port": 5174
+    }
+  ]
+}

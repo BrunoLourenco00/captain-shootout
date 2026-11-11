@@ -5,15 +5,18 @@
 You are helping build **CAPTAIN SHOOTOUT**, a first-person 3D basketball shooting game for a CAPTAIN event booth.
 
 The experience uses two screens:
+
 - Desktop: public-facing 3D game, court, hoop, timer, score and leaderboard.
 - Mobile browser: player's controller. The player scans a QR code and swipes to shoot.
 
 Each round lasts 30 seconds. The desktop is authoritative for game state, physics, timer, basket detection and score. The phone sends input commands only.
 
 Read these documents before making architectural or product decisions:
-- `PROJECT_SPEC.md`
-- `TECHNICAL_ARCHITECTURE.md`
-- `IMPLEMENTATION_PLAN.md`
+
+- `docs/DECISIONS.md` (wins over the other docs)
+- `docs/PROJECT_SPEC.md`
+- `docs/TECHNICAL_ARCHITECTURE.md`
+- `docs/IMPLEMENTATION_PLAN.md`
 
 ## Working principles
 
@@ -33,6 +36,7 @@ Read these documents before making architectural or product decisions:
 ## Product and visual constraints
 
 Use CAPTAIN brand colors:
+
 - Blue: `#1668D6`
 - Dark: `#0B1220`
 - Light: `#F7F9FB`
@@ -46,6 +50,7 @@ The desktop is a kiosk/public display. The mobile controller is portrait-first, 
 ## Technical direction
 
 Proposed stack:
+
 - pnpm workspaces
 - TypeScript
 - React + Vite
@@ -74,6 +79,7 @@ Treat these as the current proposal, not unquestionable requirements. Validate p
 ## Development workflow
 
 For each task:
+
 1. Inspect relevant files and current implementation.
 2. State the smallest useful implementation plan.
 3. Implement only the agreed milestone.
@@ -89,6 +95,7 @@ Do not claim a command or test passed unless you actually ran it and observed su
 Unless the repository already contains implementation, begin with **Phase 0 / Phase 1** from `IMPLEMENTATION_PLAN.md`.
 
 First inspect the repository and report:
+
 - Current files and package setup.
 - Whether it is empty or already initialized.
 - Any existing decisions that conflict with these documents.

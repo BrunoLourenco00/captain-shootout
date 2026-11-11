@@ -11,6 +11,7 @@ A rough initial estimate is **12–18 focused working days** for one developer i
 ## Phase 0 — Project foundation
 
 ### Tasks
+
 - [ ] Create independent `captain-shootout` repository.
 - [ ] Initialize pnpm workspace and TypeScript configuration.
 - [ ] Create desktop and mobile Vite applications.
@@ -20,11 +21,13 @@ A rough initial estimate is **12–18 focused working days** for one developer i
 - [ ] Add a README with local development instructions.
 
 ### Definition of done
+
 Both applications run locally, type-check and build.
 
 ## Phase 1 — First-person 3D prototype
 
 ### Tasks
+
 - [ ] Set up React Three Fiber scene.
 - [ ] Add first-person camera at the shooting position.
 - [ ] Create court floor, hoop, backboard and basic lighting.
@@ -35,11 +38,13 @@ Both applications run locally, type-check and build.
 - [ ] Add basic score display.
 
 ### Definition of done
+
 A developer can repeatedly launch a ball, see realistic-enough motion and reliably register makes/misses without duplicate scoring.
 
 ## Phase 2 — Mobile controller
 
 ### Tasks
+
 - [ ] Build responsive mobile connect screen.
 - [ ] Add nickname input and validation.
 - [ ] Build READY screen.
@@ -50,11 +55,13 @@ A developer can repeatedly launch a ball, see realistic-enough motion and reliab
 - [ ] Test on current iOS Safari and Android Chrome.
 
 ### Definition of done
+
 A phone can produce a normalized shot command locally and the gesture is comfortable and repeatable.
 
 ## Phase 3 — Sessions and real-time transport
 
 ### Tasks
+
 - [ ] Define transport interface.
 - [ ] Create session lifecycle service.
 - [ ] Generate session ID and temporary join token.
@@ -68,11 +75,13 @@ A phone can produce a normalized shot command locally and the gesture is comfort
 - [ ] Test local WebSocket fallback if event network conditions justify it.
 
 ### Definition of done
+
 A phone scans the desktop QR, joins the correct session and sends a shot command that triggers a desktop ball launch.
 
 ## Phase 4 — Complete game loop
 
 ### Tasks
+
 - [ ] Implement state machine.
 - [ ] Add countdown.
 - [ ] Implement desktop-authoritative 30-second timer.
@@ -84,11 +93,13 @@ A phone scans the desktop QR, joins the correct session and sends a shot command
 - [ ] Handle player disconnect and abandoned sessions.
 
 ### Definition of done
+
 A complete 30-second round can be played from scan to results and the next player can start without reloading the desktop page.
 
 ## Phase 5 — Leaderboard and event polish
 
 ### Tasks
+
 - [ ] Persist completed results.
 - [ ] Implement deterministic leaderboard ordering.
 - [ ] Add nickname moderation/length limits.
@@ -102,11 +113,13 @@ A complete 30-second round can be played from scan to results and the next playe
 - [ ] Prepare a staff recovery checklist.
 
 ### Definition of done
+
 The experience is stable enough for repeated public use, and staff can recover it without developer intervention.
 
 ## Suggested task order for the first two days
 
 ### Day 1
+
 1. Create repository and workspace.
 2. Scaffold desktop app.
 3. Render a basic court and first-person camera.
@@ -114,6 +127,7 @@ The experience is stable enough for repeated public use, and staff can recover i
 5. Make the ball launch with a temporary keyboard input.
 
 ### Day 2
+
 1. Add Rapier physics.
 2. Tune the ball trajectory.
 3. Implement basket detection.
@@ -125,6 +139,7 @@ Do not start Firebase integration before the local shooting mechanic is fun and 
 ## Test checklist
 
 ### Gameplay
+
 - [ ] Ball launches consistently.
 - [ ] Gesture direction maps correctly.
 - [ ] Low/high power behaves predictably.
@@ -133,6 +148,7 @@ Do not start Firebase integration before the local shooting mechanic is fun and 
 - [ ] Timer ends the game at 30 seconds.
 
 ### Connectivity
+
 - [ ] Correct QR/session pairing.
 - [ ] Invalid/expired token rejected.
 - [ ] Second controller rejected or handled explicitly.
@@ -142,6 +158,7 @@ Do not start Firebase integration before the local shooting mechanic is fun and 
 - [ ] Abandoned session expires.
 
 ### Event readiness
+
 - [ ] Full-screen desktop mode.
 - [ ] No accidental browser navigation.
 - [ ] Attract mode returns automatically.
@@ -153,6 +170,7 @@ Do not start Firebase integration before the local shooting mechanic is fun and 
 ## Scope control
 
 If time becomes limited, prioritize in this order:
+
 1. Reliable scan-to-play flow.
 2. Fun and responsive shooting mechanic.
 3. Accurate timer and score.

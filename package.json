@@ -1,0 +1,35 @@
+{
+  "name": "captain-shootout",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:desktop": "pnpm --filter @captain/game-desktop dev",
+    "dev:mobile": "pnpm --filter @captain/controller-mobile dev",
+    "dev:desktop:emulators": "pnpm --filter @captain/game-desktop dev:emulators",
+    "dev:mobile:emulators": "pnpm --filter @captain/controller-mobile dev:emulators",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "emulators": "firebase emulators:start --project demo-captain-shootout",
+    "deploy:controller": "pnpm --filter @captain/controller-mobile build && firebase deploy --project prod --only hosting",
+    "deploy:rules": "firebase deploy --project prod --only database,firestore",
+    "kiosk": "pnpm --filter @captain/game-desktop build && pnpm --filter @captain/game-desktop exec vite preview --port 5173 --strictPort"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2"
+  }
+}
