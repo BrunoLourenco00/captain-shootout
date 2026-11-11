@@ -54,36 +54,38 @@ export function NicknameScreen({
   return (
     <main className="screen">
       <ScreenHeader />
-      <section className="screen-hero">
-        <span className="kicker">CAPTAIN SHOOTOUT</span>
-        <h1 className="title">PICK YOUR NAME</h1>
-      </section>
-      <form className="card stack" onSubmit={submit}>
-        <label className="label" htmlFor="nickname">
-          YOUR NICKNAME
-        </label>
-        <input
-          id="nickname"
-          className="input"
-          value={value}
-          onChange={(e) => setValue(e.target.value.toUpperCase())}
-          maxLength={maxLength}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="characters"
-          spellCheck={false}
-          enterKeyHint="go"
-          placeholder="e.g. MVP23"
-          aria-invalid={error !== null}
-          aria-describedby={error ? 'nickname-error' : undefined}
-        />
-        <p id="nickname-error" className="error" role="alert">
-          {error ?? ' '}
-        </p>
-        <button className="button" type="submit" disabled={busy || value.trim().length === 0}>
-          {busy ? 'JOINING…' : 'JOIN GAME'}
-        </button>
-      </form>
+      <div className="screen-center">
+        <section className="screen-hero">
+          <span className="kicker">CAPTAIN SHOOTOUT</span>
+          <h1 className="title">PICK YOUR NAME</h1>
+        </section>
+        <form className="card stack" onSubmit={submit}>
+          <label className="label" htmlFor="nickname">
+            YOUR NICKNAME
+          </label>
+          <input
+            id="nickname"
+            className="input"
+            value={value}
+            onChange={(e) => setValue(e.target.value.toUpperCase())}
+            maxLength={maxLength}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            enterKeyHint="go"
+            placeholder="e.g. MVP23"
+            aria-invalid={error !== null}
+            aria-describedby={error ? 'nickname-error' : undefined}
+          />
+          <p id="nickname-error" className="error" role="alert">
+            {error ?? ' '}
+          </p>
+          <button className="button" type="submit" disabled={busy || value.trim().length === 0}>
+            {busy ? 'JOINING…' : 'JOIN GAME'}
+          </button>
+        </form>
+      </div>
       <p className="screen-footer">Your nickname appears on the public leaderboard.</p>
     </main>
   );
@@ -93,14 +95,16 @@ export function ReadyScreen({ nickname, onReady }: { nickname: string; onReady: 
   return (
     <main className="screen">
       <ScreenHeader nickname={nickname} />
-      <section className="screen-hero">
-        <span className="kicker">WELCOME</span>
-        <h1 className="name">{nickname}</h1>
-      </section>
-      <HowToPlay />
-      <button className="button big" onClick={onReady}>
-        READY
-      </button>
+      <div className="screen-center">
+        <section className="screen-hero">
+          <span className="kicker">WELCOME</span>
+          <h1 className="name">{nickname}</h1>
+        </section>
+        <HowToPlay />
+        <button className="button big" onClick={onReady}>
+          READY
+        </button>
+      </div>
     </main>
   );
 }
