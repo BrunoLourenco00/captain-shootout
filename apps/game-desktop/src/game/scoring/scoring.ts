@@ -39,16 +39,18 @@ export function recordAttempt(state: ScoreState): ScoreState {
   return { ...state, shots: state.shots + 1 };
 }
 
+/** `bonusMultiplier` stacks on top of the streak multiplier (clutch time). */
 export function applyOutcome(
   state: ScoreState,
   outcome: ShotOutcome,
   scoring: GameConfig['scoring'],
+  bonusMultiplier = 1,
 ): { state: ScoreState; points: number } {
   if (outcome === 'missed') {
     return { state: { ...state, streak: 0 }, points: 0 };
   }
   const streak = state.streak + 1;
-  const points = pointsFor(outcome, streak, scoring);
+  const points = pointsFor(outcome, streak, scoring) * bonusMultiplier;
   return {
     points,
     state: {

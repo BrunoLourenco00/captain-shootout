@@ -13,6 +13,8 @@ import {
   ResultsOverlay,
 } from '../features/overlays/Overlays';
 import { GameScene } from '../game/scene/GameScene';
+import { levelFor } from '../game/scoring/levels';
+import { isOnFire } from '../game/scoring/scoring';
 import { DEMO_SESSION_ID, createInitialState, makeGameReducer } from '../game/state/gameState';
 import { useDemoInput } from '../input/useDemoInput';
 import { useOperatorKeys } from '../input/useOperatorKeys';
@@ -60,10 +62,20 @@ export function App() {
   const onRemove = useCallback((shotId: string) => dispatch({ type: 'BALL_REMOVED', shotId }), []);
 
   const inRound = state.status === 'playing' || state.status === 'finished';
+  const roundActive = state.status === 'countdown' || inRound;
+  const basketSeq = state.feedback && state.feedback.outcome !== 'missed' ? state.feedback.seq : 0;
 
   return (
     <div className="stage">
-      <GameScene balls={state.balls} onResolve={onResolve} onRemove={onRemove} />
+      <GameScene
+        balls={state.balls}
+        onResolve={onResolve}
+        onRemove={onRemove}
+        roundActive={roundActive}
+        hoopMotion={levelFor(state.score.score, config.levels)}
+        onFire={inRound && isOnFire(state.score, config.scoring)}
+        basketSeq={basketSeq}
+      />
       {state.status === 'attract' && <AttractOverlay host={host} />}
       {state.status === 'connected' && <ConnectedOverlay nickname={state.nickname ?? ''} />}
       {state.status === 'countdown' && <CountdownOverlay endsAt={state.statusEndsAt} />}

@@ -1,4 +1,5 @@
 import type { GameConfig, GameStatus, ShotCommand, ShotOutcome } from '@captain/game-protocol';
+import { isClutchTime, levelIndex } from '../scoring/levels';
 import { EMPTY_SCORE, applyOutcome, recordAttempt, type ScoreState } from '../scoring/scoring';
 
 /** A ball the scene should simulate. Created only for accepted shots. */
@@ -17,6 +18,10 @@ export interface ShotFeedback {
   outcome: ShotOutcome;
   points: number;
   multiplied: boolean;
+  /** The shot was taken in clutch time (points multiplied). */
+  clutch: boolean;
+  /** Level (1-based) reached with this basket, or null if the level did not change. */
+  levelUp: number | null;
 }
 
 export type GameMode = 'live' | 'demo';
@@ -119,7 +124,16 @@ function resolveBall(
   const ball = state.balls.find((b) => b.shotId === shotId);
   // Per-shot guard: a shot resolves exactly once.
   if (!ball || ball.resolved) return state;
-  const { state: score, points } = applyOutcome(state.score, outcome, config.scoring);
+  // Clutch is decided by when the shot was taken, so a buzzer-beater still counts.
+  const clutch = isClutchTime(ball.firedAt, state.roundEndsAt, config.clutch);
+  const { state: score, points } = applyOutcome(
+    state.score,
+    outcome,
+    config.scoring,
+    clutch ? config.clutch.multiplier : 1,
+  );
+  const levelBefore = levelIndex(state.score.score, config.levels);
+  const levelAfter = levelIndex(score.score, config.levels);
   return {
     ...state,
     score,
@@ -130,6 +144,8 @@ function resolveBall(
       outcome,
       points,
       multiplied: outcome !== 'missed' && score.streak >= config.scoring.streakThreshold,
+      clutch: clutch && outcome !== 'missed',
+      levelUp: levelAfter > levelBefore ? levelAfter + 1 : null,
     },
   };
 }

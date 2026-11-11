@@ -20,6 +20,16 @@ export interface GameConfig {
     streakThreshold: number;
     streakMultiplier: number;
   };
+  /** Last stretch of the round where every basket is multiplied (stacks with streaks). */
+  clutch: {
+    lastMs: number;
+    multiplier: number;
+  };
+  /**
+   * Difficulty by score: the hoop sways left/right (and later bobs) faster the better
+   * the player is doing. Sorted by minScore; the first level must start at 0.
+   */
+  levels: LevelConfig[];
   nickname: {
     minLength: number;
     maxLength: number;
@@ -32,6 +42,16 @@ export interface GameConfig {
     /** Horizontal swipe of this fraction of the surface width is full left/right aim. */
     fullAimSwipeFraction: number;
   };
+}
+
+export interface LevelConfig {
+  minScore: number;
+  /** Left/right travel from the centre, in metres (0 = still). */
+  hoopSwayM: number;
+  /** Up/down travel from the regulation height, in metres. */
+  hoopBobM: number;
+  /** Time for one full left-right-left cycle. */
+  hoopPeriodMs: number;
 }
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
@@ -48,6 +68,16 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     streakThreshold: 5,
     streakMultiplier: 2,
   },
+  clutch: {
+    lastMs: 10_000,
+    multiplier: 2,
+  },
+  levels: [
+    { minScore: 0, hoopSwayM: 0, hoopBobM: 0, hoopPeriodMs: 4_000 },
+    { minScore: 10, hoopSwayM: 0.35, hoopBobM: 0, hoopPeriodMs: 4_200 },
+    { minScore: 25, hoopSwayM: 0.6, hoopBobM: 0, hoopPeriodMs: 3_200 },
+    { minScore: 45, hoopSwayM: 0.75, hoopBobM: 0.12, hoopPeriodMs: 2_600 },
+  ],
   nickname: {
     minLength: 2,
     maxLength: 16,
