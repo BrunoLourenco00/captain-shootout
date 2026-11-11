@@ -1,3 +1,4 @@
+import type { PlayerDna } from './dna';
 import type { ShotCommand, ShotResult } from './types';
 
 /**
@@ -21,6 +22,10 @@ export interface RoundSummary {
   accuracy: number;
   /** 1-based leaderboard position, null while unknown. */
   rank: number | null;
+  /** Players on the leaderboard when the rank was taken (for "TOP x%"); older desktops omit it. */
+  players?: number | null;
+  /** Traits from this round's shots; older desktops omit it. */
+  dna?: PlayerDna | null;
 }
 
 export interface ControllerView {

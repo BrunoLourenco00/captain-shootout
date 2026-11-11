@@ -571,7 +571,7 @@ body,
   mix-blend-mode: screen;
 }
 
-/* Coach Cap pitch on the results screen */
+/* AI Coach pitch on the results screen */
 .coach-line {
   display: flex;
   flex-direction: column;

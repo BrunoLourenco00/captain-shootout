@@ -1,4 +1,9 @@
-import type { ControllerStatus, ControllerView, GameConfig } from '@captain/game-protocol';
+import {
+  playerDna,
+  type ControllerStatus,
+  type ControllerView,
+  type GameConfig,
+} from '@captain/game-protocol';
 import { accuracy, isOnFire, nextMultiplier } from '../scoring/scoring';
 import type { GameState } from './gameState';
 
@@ -45,6 +50,15 @@ export function toControllerView(
             shots: state.score.shots,
             accuracy: accuracy(state.score),
             rank: state.rank,
+            players: state.players,
+            dna:
+              state.roundEndsAt === null
+                ? null
+                : playerDna(
+                    state.shotLog,
+                    state.roundEndsAt - config.roundDurationMs,
+                    state.roundEndsAt,
+                  ),
           }
         : null,
   };

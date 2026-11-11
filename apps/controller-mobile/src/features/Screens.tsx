@@ -1,8 +1,12 @@
 import {
+  COACH_CLOSER,
   COACH_CTA,
+  DNA_LABELS,
+  DNA_ORDER,
   coachLink,
-  coachPitch,
+  geneToUnlock,
   roundVerdict,
+  type PlayerDna,
   type ControllerView,
   type GameConfig,
   type NormalizedSwipe,
@@ -218,17 +222,13 @@ export function ResultsScreen({
       </header>
 
       <section className="results-hero" aria-label={`${score} points`}>
-        <span className="tier-badge">{verdict.title}</span>
+        <span className="results-kicker">{verdict.title}</span>
         <div className="final" aria-hidden>
           {shown}
         </div>
-        <p className="label">POINTS</p>
+        <span className="results-points">POINTS</span>
+        {r?.rank != null && <RankPill rank={r.rank} players={r.players ?? null} />}
         <p className="verdict-line">{verdict.line}</p>
-        {r?.rank != null && (
-          <p className="rank">
-            #{r.rank} <span>ON TODAY&apos;S LEADERBOARD</span>
-          </p>
-        )}
       </section>
 
       {r && (
@@ -248,13 +248,84 @@ export function ResultsScreen({
         </div>
       )}
 
-      <CoachCard score={score} />
-      <p className="fineprint">
+      {r?.dna && <DnaCard dna={r.dna} />}
+      <CoachCloser />
+
+      <p className="results-footer">
         {sessionClosed
-          ? 'Round over. Scan the new QR code on the big screen to play again.'
+          ? 'Want a rematch? Scan the new QR code on the big screen.'
           : '📸 Screenshot this to keep your score!'}
       </p>
     </main>
+  );
+}
+
+/** Below this many players a percentage says nothing ("top 50%" of 4 people). */
+const MIN_PLAYERS_FOR_PERCENT = 10;
+
+function RankPill({ rank, players }: { rank: number; players: number | null }) {
+  const percent =
+    players !== null && players >= MIN_PLAYERS_FOR_PERCENT
+      ? Math.max(1, Math.ceil((rank / players) * 100))
+      : null;
+  return (
+    <p className="rank">
+      #{rank} ON THE BOARD{percent !== null && ` · TOP ${percent}%`}
+    </p>
+  );
+}
+
+/** Five traits from this round's shots, with the weakest one called out. */
+function DnaCard({ dna }: { dna: PlayerDna }) {
+  const gene = geneToUnlock(dna);
+  return (
+    <section className="dna-card" aria-label="Your player DNA">
+      <header className="dna-head">
+        <h2>YOUR PLAYER DNA</h2>
+        <span>SAMPLE: 1 ROUND</span>
+      </header>
+      <Helix />
+      <ul className="dna-bars">
+        {DNA_ORDER.map((trait) => (
+          <li key={trait} className={trait === gene.trait ? 'weak' : undefined}>
+            <abbr title={DNA_LABELS[trait].name}>{DNA_LABELS[trait].short}</abbr>
+            <span className="dna-track" aria-hidden>
+              <span className="dna-fill" style={{ width: `${dna[trait]}%` }} />
+            </span>
+            <strong>{dna[trait]}</strong>
+          </li>
+        ))}
+      </ul>
+      <p className="dna-gene">
+        <b>Gene to unlock: {gene.name}.</b> {gene.text} The AI Coach builds drills around exactly
+        that.
+      </p>
+    </section>
+  );
+}
+
+/** Decorative double helix: two dashed strands with rungs between them. */
+function Helix() {
+  const width = 300;
+  const mid = 30;
+  const amp = 24;
+  const turns = 1.5;
+  const y = (x: number, sign: number) =>
+    mid + sign * amp * Math.sin((x / width) * turns * 2 * Math.PI);
+  const strand = (sign: number) =>
+    Array.from({ length: 61 }, (_, i) => {
+      const x = (i / 60) * width;
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y(x, sign).toFixed(1)}`;
+    }).join(' ');
+  const rungs = Array.from({ length: 21 }, (_, i) => ((i + 0.5) / 21) * width);
+  return (
+    <svg className="dna-helix" viewBox={`-4 0 ${width + 8} 60`} aria-hidden>
+      {rungs.map((x) => (
+        <line key={x} x1={x} x2={x} y1={y(x, 1)} y2={y(x, -1)} />
+      ))}
+      <path d={strand(1)} />
+      <path d={strand(-1)} />
+    </svg>
   );
 }
 
@@ -279,20 +350,22 @@ function useCountUp(target: number, durationMs = 900): number {
   return value;
 }
 
-/** Where "Train with Coach Cap" leads (CAPTAIN app page). Overridable per deploy. */
+/** Where "Unlock my full DNA" leads (CAPTAIN app page). Overridable per deploy. */
 const COACH_URL = import.meta.env.VITE_COACH_URL || 'https://trycaptain.app';
 
-/** End-of-round pitch for Coach Cap, CAPTAIN's AI coach. */
-function CoachCard({ score }: { score: number }) {
-  const pitch = coachPitch(score);
+/** Closing pitch for the AI Coach in the CAPTAIN app. */
+function CoachCloser() {
   return (
-    <section className="coach-card" aria-label="Coach Cap">
-      <span className="coach-kicker">AI COACH</span>
-      <h2>{pitch.headline}</h2>
-      <p>{pitch.body}</p>
+    <section className="coach-closer" aria-label="AI Coach">
+      <h2>
+        {COACH_CLOSER.headline}
+        <span>{COACH_CLOSER.highlight}</span>
+      </h2>
+      <p>{COACH_CLOSER.body}</p>
       <a className="coach-cta" href={coachLink(COACH_URL)} target="_blank" rel="noreferrer">
-        {COACH_CTA}
+        {COACH_CTA} <span aria-hidden>→</span>
       </a>
+      <small>{COACH_CLOSER.fineprint}</small>
     </section>
   );
 }

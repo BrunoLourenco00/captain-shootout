@@ -69,4 +69,4 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 - **Levels by score** (`config.levels`): still hoop until 10 points; from 10 it sways left/right, faster and wider at 25, and also bobs at 45. Shots still aim at the regulation spot, so players must lead the moving hoop.
 - ~~Clutch time~~ (last 10 s worth x2) was tried and dropped the same day in favour of the two-step streak multiplier (see Scoring).
 - Arena branding: CAPTAIN wordmark in the key and on the LED boards; **DHIKA** as official sponsor (LED boards, banners, attract screen).
-- End of round: Coach Cap pitch (AI coach in the CAPTAIN app), tone by score; the phone shows a "Train with Coach Cap" button to `VITE_COACH_URL` (default `https://trycaptain.app`, tagged `utm_source=shootout`).
+- End of round: AI Coach pitch (the coach in the CAPTAIN app), tone by score; the phone shows a "Player DNA" from the round's shots (accuracy, volume, rhythm, clutch, stamina, computed by the desktop) and an "Unlock my full DNA" button to `VITE_COACH_URL` (default `https://trycaptain.app`, tagged `utm_source=shootout`).
