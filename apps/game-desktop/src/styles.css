@@ -69,13 +69,19 @@ body,
 
 /* The real CAPTAIN logo (white with the blue "AI"), sized to the text's cap height. */
 .wordmark-logo {
-  height: 0.78em;
+  height: 0.74em;
   width: auto;
   display: block;
 }
 
+/* "SHOOTOUT" follows the logo: upright, medium weight, wide tracking, logo blue,
+   cap height matched to the logo's letters. */
 .wordmark span {
   color: var(--blue);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1;
 }
 
 .muted {
