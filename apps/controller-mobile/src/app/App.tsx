@@ -153,8 +153,10 @@ function Controller({ params }: { params: JoinParams }) {
             />
           )
         );
-      case 'results':
-        return view && <ResultsScreen view={view} />;
+      case 'results': {
+        const shown = state.finalView ?? view;
+        return shown && <ResultsScreen view={shown} sessionClosed={view?.status === 'closed'} />;
+      }
       case 'ended':
         return (
           <MessageScreen

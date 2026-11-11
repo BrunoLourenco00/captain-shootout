@@ -59,6 +59,20 @@ describe('controller screens', () => {
     expect(at('results')).toBe('results');
     expect(at('closed')).toBe('ended');
   });
+
+  it('keeps showing the results after the desktop closes the session', () => {
+    const results = {
+      ...view('results'),
+      results: { score: 12, baskets: 6, shots: 9, accuracy: 0.67, rank: 2 },
+    };
+    const s = run(
+      { type: 'JOINED' },
+      { type: 'VIEW', view: results },
+      { type: 'VIEW', view: view('closed') },
+    );
+    expect(selectScreen(s)).toBe('results');
+    expect(s.finalView?.results?.score).toBe(12);
+  });
 });
 
 describe('canShoot', () => {

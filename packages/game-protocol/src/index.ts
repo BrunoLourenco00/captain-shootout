@@ -5,3 +5,4 @@ export * from './nickname';
 export * from './controller';
 export * from './host';
 export * from './coach';
+export * from './verdict';
