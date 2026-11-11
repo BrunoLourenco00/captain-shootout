@@ -3,6 +3,7 @@ import {
   type GameConfig,
   type GameStatus,
   type ShotCommand,
+  type DnaShot,
   type ShotOutcome,
 } from '@captain/game-protocol';
 import { levelIndex } from '../scoring/levels';
@@ -42,6 +43,10 @@ export interface GameState {
   controllerConnected: boolean;
   /** Leaderboard rank of the last finished round, once saved. */
   rank: number | null;
+  /** Players on the leaderboard when the rank was saved. */
+  players: number | null;
+  /** Every resolved shot of the round (for the player DNA). */
+  shotLog: DnaShot[];
   /** Deadline for the current status (ready timeout, countdown, round, buzzer grace, results). */
   statusEndsAt: number | null;
   roundEndsAt: number | null;
@@ -56,7 +61,7 @@ export type GameAction =
   | { type: 'SESSION_OPENED'; sessionId: string }
   | { type: 'PLAYER_JOINED'; sessionId: string; nickname: string; now: number }
   | { type: 'CONTROLLER_PRESENCE'; connected: boolean }
-  | { type: 'RESULT_SAVED'; rank: number | null }
+  | { type: 'RESULT_SAVED'; rank: number | null; players?: number | null }
   | { type: 'PLAYER_READY'; now: number }
   | { type: 'DEMO_START'; now: number }
   | { type: 'TICK'; now: number }
@@ -76,6 +81,8 @@ export function createInitialState(sessionId: string | null = null): GameState {
     nickname: null,
     controllerConnected: false,
     rank: null,
+    players: null,
+    shotLog: [],
     statusEndsAt: null,
     roundEndsAt: null,
     score: EMPTY_SCORE,
@@ -116,6 +123,7 @@ function startCountdown(state: GameState, now: number, config: GameConfig): Game
     roundEndsAt: countdownEndsAt + config.roundDurationMs,
     score: EMPTY_SCORE,
     balls: [],
+    shotLog: [],
     seenShotIds: new Set(),
     lastShotAt: null,
     feedback: null,
@@ -141,6 +149,7 @@ function resolveBall(
     ...state,
     score,
     balls: state.balls.map((b) => (b.shotId === shotId ? { ...b, resolved: true } : b)),
+    shotLog: [...state.shotLog, { firedAt: ball.firedAt, outcome }],
     feedback: {
       seq: (state.feedback?.seq ?? 0) + 1,
       shotId,
@@ -216,7 +225,7 @@ export function makeGameReducer(config: GameConfig) {
 
       case 'RESULT_SAVED':
         if (state.status !== 'results') return state;
-        return { ...state, rank: action.rank };
+        return { ...state, rank: action.rank, players: action.players ?? null };
 
       case 'DEMO_START':
         if (state.status !== 'attract') return state;

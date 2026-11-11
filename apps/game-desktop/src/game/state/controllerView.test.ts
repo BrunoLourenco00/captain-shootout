@@ -67,11 +67,11 @@ describe('toControllerView', () => {
       { type: 'TICK', now: 3000 },
       { type: 'TICK', now: ROUND_END },
       { type: 'TICK', now: ROUND_END + 1 },
-      { type: 'RESULT_SAVED', rank: 2 },
+      { type: 'RESULT_SAVED', rank: 2, players: 40 },
     );
     expect(toControllerView(s, 34_000, config)).toMatchObject({
       status: 'results',
-      results: { score: 0, shots: 0, accuracy: 0, rank: 2 },
+      results: { score: 0, shots: 0, accuracy: 0, rank: 2, players: 40, dna: { accuracy: 0 } },
     });
   });
 });

@@ -8,8 +8,8 @@ describe('coachPitch', () => {
     expect(coachPitch(30).headline).toMatch(/touch/);
   });
 
-  it('always names Coach Cap', () => {
-    for (const score of [0, 15, 60]) expect(coachPitch(score).body).toContain('Coach Cap');
+  it('always names the AI Coach', () => {
+    for (const score of [0, 15, 60]) expect(coachPitch(score).body).toContain('AI Coach');
   });
 });
 

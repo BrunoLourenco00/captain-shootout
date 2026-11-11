@@ -241,15 +241,13 @@ export function ResultsOverlay({
   );
 }
 
-/** Coach Cap pitch for the crowd; the player gets the button on their phone. */
+/** AI Coach pitch for the crowd; the player gets the button on their phone. */
 function CoachLine({ score }: { score: number }) {
   const pitch = coachPitch(score);
   return (
     <div className="coach-line">
       <strong>{pitch.headline}</strong>
-      <span>
-        Train with Coach Cap, the AI coach in the CAPTAIN app. Tap the button on your phone.
-      </span>
+      <span>Train with the AI Coach in the CAPTAIN app. Tap the button on your phone.</span>
     </div>
   );
 }

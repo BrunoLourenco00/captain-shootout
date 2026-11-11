@@ -320,20 +320,53 @@ body,
   font-size: 32px;
 }
 
-/* Results */
+/* Results: Player DNA card layout (ported from the Lovable design) */
 .results {
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --r-bg: oklch(14% 0.03 262);
+  --r-fg: oklch(97% 0.01 250);
+  --r-card: oklch(19% 0.04 262);
+  --r-primary: oklch(62% 0.19 258);
+  --r-glow: oklch(78% 0.15 230);
+  --r-secondary: oklch(24% 0.04 262);
+  --r-muted: oklch(68% 0.04 255);
+  --r-accent: oklch(80% 0.17 65);
+  --r-line: oklch(100% 0 0 / 0.09);
+  --r-gradient: linear-gradient(135deg, var(--r-primary), var(--r-glow));
+  --r-shadow: 0 10px 40px -10px color-mix(in oklab, var(--r-primary) 60%, transparent);
+  --tier: var(--r-glow);
   justify-content: flex-start;
-  align-items: center;
-  gap: 18px;
+  align-items: stretch;
+  gap: 20px;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  font-family: 'Barlow', 'Inter', system-ui, sans-serif;
+  color: var(--r-fg);
   text-align: center;
-  --tier: var(--blue);
   background:
-    radial-gradient(
-      120% 55% at 50% 0%,
-      color-mix(in srgb, var(--tier) 30%, transparent),
-      transparent 70%
-    ),
-    var(--dark);
+    radial-gradient(120% 60% at 50% 0%, oklch(32% 0.12 260 / 0.7), transparent 60%), var(--r-bg);
+}
+
+.results > * {
+  width: 100%;
+  max-width: 448px;
+  margin-inline: auto;
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.results > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.results > :nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.results > :nth-child(4) {
+  animation-delay: 240ms;
+}
+
+.results > :nth-child(n + 5) {
+  animation-delay: 320ms;
 }
 
 .results.tier-mvp {
@@ -344,78 +377,86 @@ body,
   --tier: var(--hot);
 }
 
-.results.tier-rookie {
-  --tier: #4f9bff;
-}
-
 .results.tier-airball {
-  --tier: var(--secondary);
+  --tier: var(--r-muted);
 }
 
 .results-head {
-  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .results-logo {
-  height: 20px;
+  height: 22px;
   width: auto;
 }
 
 .results-player {
   max-width: 55%;
+  padding: 4px 12px;
+  border: 1px solid var(--r-line);
+  border-radius: 999px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--r-muted);
 }
 
 .results-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
 }
 
-.tier-badge {
-  padding: 6px 16px;
-  border-radius: 999px;
-  border: 2px solid var(--tier);
+.results-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
   color: var(--tier);
-  font-weight: 900;
-  font-size: 15px;
-  letter-spacing: 0.22em;
-  animation: pop 0.6s ease-out both;
 }
 
 .final {
-  font-size: 120px;
+  font-family: var(--display);
+  font-size: 144px;
   font-weight: 900;
-  font-style: italic;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 40px color-mix(in srgb, var(--tier) 55%, transparent);
+  text-shadow: 0 0 60px color-mix(in oklab, var(--r-glow) 45%, transparent);
 }
 
-.results .label {
-  margin: 0;
+.results-points {
+  margin-top: -8px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--r-muted);
+}
+
+.rank {
+  margin: 16px 0 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .verdict-line {
-  max-width: 300px;
-  margin: 8px 0 4px;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.35;
+  max-width: 320px;
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--r-muted);
 }
 
 .stats {
-  width: 100%;
-  max-width: 360px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -425,37 +466,226 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 12px 4px;
-  border-radius: 14px;
-  background: rgb(247 249 251 / 0.06);
-  border: 1px solid rgb(225 231 239 / 0.12);
+  padding: 12px 0;
+  border-radius: 16px;
+  border: 1px solid var(--r-line);
+  background: color-mix(in oklab, var(--r-card) 70%, transparent);
 }
 
 .stats strong {
-  font-size: 26px;
-  font-weight: 900;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .stats span {
   font-size: 10px;
-  letter-spacing: 0.15em;
-  color: var(--border);
-  opacity: 0.75;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--r-muted);
 }
 
-.rank {
-  margin: 6px 0 0;
-  padding: 8px 16px;
+/* Player DNA */
+.dna-card {
+  padding: 20px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
+  background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
+  text-align: left;
+}
+
+.dna-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dna-head h2 {
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+}
+
+.dna-head span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--r-glow);
+  white-space: nowrap;
+}
+
+.dna-helix {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+.dna-helix .rung {
+  stroke: color-mix(in oklab, var(--r-primary) 40%, transparent);
+  stroke-width: 2;
+}
+
+.dna-helix .strand {
+  fill: none;
+  stroke: var(--r-primary);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 4;
+  animation: helix 6s linear infinite;
+}
+
+.dna-helix .strand.glow {
+  stroke: var(--r-glow);
+}
+
+.dna-helix circle {
+  fill: var(--r-glow);
+}
+
+.dna-bars {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.dna-bars li {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 2rem;
+  align-items: center;
+  gap: 12px;
+}
+
+.dna-bars abbr {
+  text-decoration: none;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--r-muted);
+}
+
+.dna-track {
+  height: 8px;
   border-radius: 999px;
-  background: var(--blue);
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  background: var(--r-secondary);
+  overflow: hidden;
 }
 
-.rank span {
+.dna-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--r-gradient);
+  transform-origin: left;
+  animation: grow 0.9s 0.3s ease-out both;
+}
+
+.dna-bars li.weak .dna-fill {
+  background: var(--r-accent);
+}
+
+.dna-bars strong {
+  font-size: 14px;
   font-weight: 700;
-  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.dna-gene {
+  margin: 16px 0 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--r-accent) 10%, transparent);
+  font-size: 14px;
+  line-height: 1.43;
+}
+
+.dna-gene b {
+  color: var(--r-accent);
+}
+
+/* AI Coach closer */
+.coach-closer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.coach-closer h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.coach-closer h2 span {
+  display: block;
+  color: var(--r-glow);
+}
+
+.coach-closer p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.43;
+  color: var(--r-muted);
+}
+
+.coach-cta {
+  display: block;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
+  color: var(--light);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: transform 0.15s;
+}
+
+.coach-cta:active {
+  transform: scale(0.95);
+}
+
+.coach-closer small {
+  font-size: 12px;
+  color: var(--r-muted);
+}
+
+.results-footer {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--r-line);
+  font-size: 12px;
+  color: var(--r-muted);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes helix {
+  to {
+    stroke-dashoffset: -200px;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 @keyframes pop {
@@ -512,56 +742,9 @@ body,
   .swipe-hint,
   .countdown,
   .ball-fly,
-  .tier-badge {
+  .results > *,
+  .dna-helix .strand,
+  .dna-fill {
     animation: none;
   }
-}
-
-/* Coach Cap pitch on the results screen */
-.coach-card {
-  width: 100%;
-  max-width: 360px;
-  padding: 18px 18px 20px;
-  border-radius: 18px;
-  border: 1px solid rgb(22 104 214 / 0.6);
-  background: linear-gradient(160deg, rgb(22 104 214 / 0.28), rgb(11 18 32 / 0.6));
-  text-align: left;
-}
-
-.coach-kicker {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.25em;
-  color: var(--blue);
-}
-
-.coach-card h2 {
-  margin: 6px 0 6px;
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1.15;
-}
-
-.coach-card p {
-  margin: 0 0 14px;
-  font-size: 15px;
-  line-height: 1.4;
-  color: var(--border);
-}
-
-.coach-cta {
-  display: block;
-  min-height: 52px;
-  padding: 15px 16px;
-  border-radius: 14px;
-  background: var(--blue);
-  color: var(--light);
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-align: center;
-  text-decoration: none;
-}
-
-.coach-cta:active {
-  transform: scale(0.98);
 }

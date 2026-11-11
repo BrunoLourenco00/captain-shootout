@@ -71,6 +71,14 @@ export function createMockTransport(config = DEFAULT_GAME_CONFIG): ControllerTra
                 shots,
                 accuracy: shots ? baskets / shots : 0,
                 rank: 3,
+                players: 120,
+                dna: {
+                  accuracy: shots ? Math.round((baskets / shots) * 100) : 0,
+                  volume: 55,
+                  rhythm: 64,
+                  clutch: 38,
+                  stamina: 72,
+                },
               },
             });
             later(config.resultsDurationMs, () => publish({ status: 'closed' }));

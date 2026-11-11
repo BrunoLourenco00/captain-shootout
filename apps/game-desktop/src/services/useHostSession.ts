@@ -145,8 +145,8 @@ export function useHostSession(
     savedRound.current = roundId;
     const { score, baskets, shots } = state.score;
     store.submit({ nickname: state.nickname, score, baskets, shots, completedAt: Date.now() }).then(
-      ({ rank }) => {
-        dispatch({ type: 'RESULT_SAVED', rank });
+      ({ rank, players }) => {
+        dispatch({ type: 'RESULT_SAVED', rank, players });
         // A failed refresh must not erase the rank that was just saved.
         store
           .top(LEADERBOARD_SIZE)

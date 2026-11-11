@@ -1,13 +1,21 @@
 /**
- * End-of-round pitch for Coach Cap, the AI coach in the CAPTAIN app (chat coach and
- * workouts built from the player's own game). The line depends on how the round went.
+ * End-of-round pitch for the AI Coach in the CAPTAIN app (chat coach and workouts
+ * built from the player's own game). The line depends on how the round went.
  */
 export interface CoachPitch {
   headline: string;
   body: string;
 }
 
-export const COACH_CTA = 'TRAIN WITH COACH CAP';
+export const COACH_CTA = 'UNLOCK MY FULL DNA';
+
+/** Phone pitch under the player DNA. */
+export const COACH_CLOSER = {
+  headline: 'THIS WAS ONE ROUND.',
+  highlight: 'IMAGINE EVERY SHOT YOU TAKE.',
+  body: 'The AI Coach in the CAPTAIN app learns your DNA from every session and turns it into a training plan that evolves with you.',
+  fineprint: 'Free in the CAPTAIN app',
+} as const;
 
 /** Score thresholds for the pitch tone; on a 45-second round 30+ is a strong round. */
 const STRONG_ROUND = 30;
@@ -17,18 +25,18 @@ export function coachPitch(score: number): CoachPitch {
   if (score >= STRONG_ROUND) {
     return {
       headline: "You've got the touch.",
-      body: 'Now make it a habit: Coach Cap builds your next workout around your game.',
+      body: 'Now make it a habit: the AI Coach builds your next workout around your game.',
     };
   }
   if (score >= DECENT_ROUND) {
     return {
       headline: 'Good shot. Want a better one?',
-      body: 'Coach Cap, the AI coach in the CAPTAIN app, turns your game into a plan made for you.',
+      body: 'The AI Coach in the CAPTAIN app turns your game into a plan made for you.',
     };
   }
   return {
     headline: "Rough round? That's what coaches are for.",
-    body: 'Coach Cap, the AI coach in the CAPTAIN app, builds the workouts to fix it.',
+    body: 'The AI Coach in the CAPTAIN app builds the workouts to fix it.',
   };
 }
 

@@ -1,0 +1,52 @@
+/* Dev-only gallery styles (loaded only with ?preview). */
+.preview-gallery {
+  padding: 24px 32px 64px;
+  font-family: system-ui, sans-serif;
+}
+
+.preview-gallery h1 {
+  margin: 0 0 4px;
+}
+
+.preview-gallery p {
+  margin: 0 0 24px;
+  color: var(--border);
+  opacity: 0.7;
+}
+
+.preview-gallery h2 {
+  margin: 28px 0 12px;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* A 375x812 phone shown at half size. */
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 188px;
+  color: var(--light);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.preview-card iframe {
+  width: 375px;
+  height: 812px;
+  transform: scale(0.5);
+  transform-origin: top left;
+  margin-bottom: -406px;
+  border: 1px solid rgb(225 231 239 / 0.25);
+  border-radius: 36px;
+  pointer-events: none;
+  background: var(--dark);
+}

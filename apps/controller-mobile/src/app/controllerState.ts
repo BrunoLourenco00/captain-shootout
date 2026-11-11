@@ -18,7 +18,7 @@ export interface ControllerState {
   lastShotAt: number | null;
   /**
    * The last view that carried round results. Kept after the desktop closes the
-   * session so the player can still read their result and open the Coach Cap link.
+   * session so the player can still read their result and open the AI Coach link.
    */
   finalView: ControllerView | null;
 }

@@ -61,8 +61,11 @@ export function createFirestoreLeaderboard(settings: FirebaseSettings): Leaderbo
         return entry;
       });
       // Rank of the nickname's best result (ties on score share the better rank).
-      const higher = await getCountFromServer(query(col, where('score', '>', best.score)));
-      return { rank: higher.data().count + 1 };
+      const [higher, all] = await Promise.all([
+        getCountFromServer(query(col, where('score', '>', best.score))),
+        getCountFromServer(col),
+      ]);
+      return { rank: higher.data().count + 1, players: all.data().count };
     },
 
     async top(n) {

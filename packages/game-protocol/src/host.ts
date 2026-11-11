@@ -38,8 +38,11 @@ export interface LeaderboardEntry {
 }
 
 export interface LeaderboardStore {
-  /** Stores the result if it is the nickname's best and returns the leaderboard rank (1-based). */
-  submit(entry: LeaderboardEntry): Promise<{ rank: number | null }>;
+  /**
+   * Stores the result if it is the nickname's best and returns the leaderboard rank
+   * (1-based) and how many players are on the board.
+   */
+  submit(entry: LeaderboardEntry): Promise<{ rank: number | null; players?: number | null }>;
   top(limit: number): Promise<LeaderboardEntry[]>;
 }
 
