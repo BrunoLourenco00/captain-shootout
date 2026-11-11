@@ -304,27 +304,25 @@ function DnaCard({ dna }: { dna: PlayerDna }) {
   );
 }
 
-/** Decorative double helix: two dashed strands with rungs between them. */
+/** Decorative double helix: two dashed strands that drift, with rungs and dots. */
 function Helix() {
-  const width = 300;
-  const mid = 30;
-  const amp = 24;
-  const turns = 1.5;
-  const y = (x: number, sign: number) =>
-    mid + sign * amp * Math.sin((x / width) * turns * 2 * Math.PI);
-  const strand = (sign: number) =>
-    Array.from({ length: 61 }, (_, i) => {
-      const x = (i / 60) * width;
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y(x, sign).toFixed(1)}`;
-    }).join(' ');
-  const rungs = Array.from({ length: 21 }, (_, i) => ((i + 0.5) / 21) * width);
+  const points = Array.from({ length: 22 }, (_, i) => {
+    const x = (i / 21) * 300;
+    const offset = 30 * Math.sin((x / 200) * 2 * Math.PI);
+    return { x, top: 45 + offset, bottom: 45 - offset };
+  });
+  const strand = (key: 'top' | 'bottom') =>
+    points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p[key].toFixed(1)}`).join(' ');
   return (
-    <svg className="dna-helix" viewBox={`-4 0 ${width + 8} 60`} aria-hidden>
-      {rungs.map((x) => (
-        <line key={x} x1={x} x2={x} y1={y(x, 1)} y2={y(x, -1)} />
+    <svg className="dna-helix" viewBox="0 0 300 90" aria-hidden>
+      {points.map((p) => (
+        <line key={p.x} x1={p.x} x2={p.x} y1={p.top} y2={p.bottom} className="rung" />
       ))}
-      <path d={strand(1)} />
-      <path d={strand(-1)} />
+      <path d={strand('top')} className="strand glow" />
+      <path d={strand('bottom')} className="strand" />
+      {points.map((p) => (
+        <circle key={p.x} cx={p.x} cy={p.top} r="2.5" />
+      ))}
     </svg>
   );
 }

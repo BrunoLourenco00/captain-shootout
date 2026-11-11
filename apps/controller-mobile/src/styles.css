@@ -320,19 +320,53 @@ body,
   font-size: 32px;
 }
 
-/* Results: sports-card look (Barlow Condensed display type) */
+/* Results: Player DNA card layout (ported from the Lovable design) */
 .results {
-  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-  --cyan: #2ec5ff;
-  --tier: var(--cyan);
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --r-bg: oklch(14% 0.03 262);
+  --r-fg: oklch(97% 0.01 250);
+  --r-card: oklch(19% 0.04 262);
+  --r-primary: oklch(62% 0.19 258);
+  --r-glow: oklch(78% 0.15 230);
+  --r-secondary: oklch(24% 0.04 262);
+  --r-muted: oklch(68% 0.04 255);
+  --r-accent: oklch(80% 0.17 65);
+  --r-line: oklch(100% 0 0 / 0.09);
+  --r-gradient: linear-gradient(135deg, var(--r-primary), var(--r-glow));
+  --r-shadow: 0 10px 40px -10px color-mix(in oklab, var(--r-primary) 60%, transparent);
+  --tier: var(--r-glow);
   justify-content: flex-start;
   align-items: stretch;
-  gap: 18px;
+  gap: 20px;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
   font-family: 'Barlow', 'Inter', system-ui, sans-serif;
+  color: var(--r-fg);
   text-align: center;
   background:
-    radial-gradient(90% 40% at 50% 12%, rgb(22 104 214 / 0.45), transparent 70%),
-    linear-gradient(180deg, #0a1f45 0%, #06101f 45%, #04080f 100%);
+    radial-gradient(120% 60% at 50% 0%, oklch(32% 0.12 260 / 0.7), transparent 60%), var(--r-bg);
+}
+
+.results > * {
+  width: 100%;
+  max-width: 448px;
+  margin-inline: auto;
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.results > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.results > :nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.results > :nth-child(4) {
+  animation-delay: 240ms;
+}
+
+.results > :nth-child(n + 5) {
+  animation-delay: 320ms;
 }
 
 .results.tier-mvp {
@@ -344,7 +378,7 @@ body,
 }
 
 .results.tier-airball {
-  --tier: #8fa3bf;
+  --tier: var(--r-muted);
 }
 
 .results-head {
@@ -360,68 +394,66 @@ body,
 
 .results-player {
   max-width: 55%;
-  padding: 6px 14px;
-  border: 1px solid rgb(225 231 239 / 0.25);
+  padding: 4px 12px;
+  border: 1px solid var(--r-line);
   border-radius: 999px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.15em;
-  color: var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--r-muted);
 }
 
 .results-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 4px;
 }
 
 .results-kicker {
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.32em;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
   color: var(--tier);
-  animation: pop 0.6s ease-out both;
 }
 
 .final {
   font-family: var(--display);
-  font-size: 128px;
-  font-weight: 800;
-  line-height: 0.95;
+  font-size: 144px;
+  font-weight: 900;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 50px rgb(46 197 255 / 0.35);
+  text-shadow: 0 0 60px color-mix(in oklab, var(--r-glow) 45%, transparent);
 }
 
 .results-points {
-  font-weight: 600;
+  margin-top: -8px;
   font-size: 14px;
-  letter-spacing: 0.35em;
-  color: #9fb0c6;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--r-muted);
 }
 
 .rank {
-  margin: 14px 0 0;
-  padding: 10px 20px;
+  margin: 16px 0 0;
+  padding: 8px 16px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--blue), var(--cyan));
-  box-shadow: 0 6px 24px rgb(46 197 255 / 0.35);
-  font-family: var(--display);
-  font-weight: 800;
-  font-size: 17px;
-  letter-spacing: 0.06em;
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .verdict-line {
-  max-width: 300px;
+  max-width: 320px;
   margin: 12px 0 0;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--border);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--r-muted);
 }
 
 .stats {
@@ -434,33 +466,32 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 12px 4px 10px;
-  border-radius: 18px;
-  background: rgb(10 22 44 / 0.6);
-  border: 1px solid rgb(225 231 239 / 0.12);
+  padding: 12px 0;
+  border-radius: 16px;
+  border: 1px solid var(--r-line);
+  background: color-mix(in oklab, var(--r-card) 70%, transparent);
 }
 
 .stats strong {
   font-family: var(--display);
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .stats span {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.16em;
-  color: #9fb0c6;
+  letter-spacing: 0.1em;
+  color: var(--r-muted);
 }
 
 /* Player DNA */
 .dna-card {
-  padding: 20px 18px 16px;
+  padding: 20px;
   border-radius: 24px;
-  border: 1px solid rgb(22 104 214 / 0.55);
-  background: linear-gradient(180deg, rgb(12 34 72 / 0.75), rgb(6 14 28 / 0.85));
+  border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
+  background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
   text-align: left;
 }
 
@@ -475,41 +506,49 @@ body,
   margin: 0;
   white-space: nowrap;
   font-family: var(--display);
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
-  line-height: 1;
+  letter-spacing: 0.025em;
 }
 
 .dna-head span {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.1em;
-  color: var(--cyan);
+  color: var(--r-glow);
   white-space: nowrap;
 }
 
 .dna-helix {
   display: block;
-  width: 72%;
-  margin: 14px auto 10px;
-  fill: none;
-  stroke: var(--cyan);
+  width: 100%;
+  height: 80px;
 }
 
-.dna-helix path {
+.dna-helix .rung {
+  stroke: color-mix(in oklab, var(--r-primary) 40%, transparent);
   stroke-width: 2;
-  stroke-dasharray: 5 4;
 }
 
-.dna-helix line {
-  stroke: var(--blue);
-  stroke-width: 1.5;
-  opacity: 0.8;
+.dna-helix .strand {
+  fill: none;
+  stroke: var(--r-primary);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 4;
+  animation: helix 6s linear infinite;
+}
+
+.dna-helix .strand.glow {
+  stroke: var(--r-glow);
+}
+
+.dna-helix circle {
+  fill: var(--r-glow);
 }
 
 .dna-bars {
   list-style: none;
-  margin: 0;
+  margin: 8px 0 0;
   padding: 0;
   display: grid;
   gap: 10px;
@@ -517,7 +556,7 @@ body,
 
 .dna-bars li {
   display: grid;
-  grid-template-columns: 38px 1fr 30px;
+  grid-template-columns: 2.5rem 1fr 2rem;
   align-items: center;
   gap: 12px;
 }
@@ -525,15 +564,16 @@ body,
 .dna-bars abbr {
   text-decoration: none;
   font-family: var(--display);
-  font-weight: 700;
-  font-size: 17px;
-  color: #9fb0c6;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--r-muted);
 }
 
 .dna-track {
-  height: 10px;
+  height: 8px;
   border-radius: 999px;
-  background: rgb(225 231 239 / 0.08);
+  background: var(--r-secondary);
   overflow: hidden;
 }
 
@@ -541,95 +581,105 @@ body,
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  background: var(--r-gradient);
   transform-origin: left;
-  animation: grow 0.9s ease-out both;
+  animation: grow 0.9s 0.3s ease-out both;
 }
 
 .dna-bars li.weak .dna-fill {
-  background: linear-gradient(90deg, #ff9a1a, #ffb547);
+  background: var(--r-accent);
 }
 
 .dna-bars strong {
-  font-family: var(--display);
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
 .dna-gene {
   margin: 16px 0 0;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgb(225 231 239 / 0.07);
-  font-size: 15px;
-  line-height: 1.4;
-  color: var(--border);
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--r-accent) 10%, transparent);
+  font-size: 14px;
+  line-height: 1.43;
 }
 
 .dna-gene b {
-  color: #ffa733;
+  color: var(--r-accent);
 }
 
 /* AI Coach closer */
 .coach-closer {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 12px;
-  margin-top: 6px;
 }
 
 .coach-closer h2 {
   margin: 0;
   font-family: var(--display);
-  font-size: 27px;
+  font-size: 30px;
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.25;
 }
 
 .coach-closer h2 span {
   display: block;
-  color: #5cc0ff;
+  color: var(--r-glow);
 }
 
 .coach-closer p {
   margin: 0;
-  max-width: 320px;
-  font-size: 15px;
-  line-height: 1.45;
-  color: #9fb0c6;
+  font-size: 14px;
+  line-height: 1.43;
+  color: var(--r-muted);
 }
 
 .coach-cta {
-  width: 100%;
-  min-height: 56px;
-  padding: 17px 16px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #3f86f0, #5cc0ff);
-  box-shadow: 0 8px 28px rgb(92 192 255 / 0.3);
+  display: block;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
   color: var(--light);
-  font-weight: 700;
   font-size: 16px;
-  letter-spacing: 0.14em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-decoration: none;
+  transition: transform 0.15s;
 }
 
 .coach-cta:active {
-  transform: scale(0.98);
+  transform: scale(0.95);
 }
 
 .coach-closer small {
-  font-size: 13px;
-  color: #7d8ca3;
+  font-size: 12px;
+  color: var(--r-muted);
 }
 
 .results-footer {
   margin: 0;
   padding-top: 16px;
-  border-top: 1px solid rgb(225 231 239 / 0.1);
-  font-size: 14px;
-  color: #9fb0c6;
+  border-top: 1px solid var(--r-line);
+  font-size: 12px;
+  color: var(--r-muted);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes helix {
+  to {
+    stroke-dashoffset: -200px;
+  }
 }
 
 @keyframes grow {
@@ -692,7 +742,8 @@ body,
   .swipe-hint,
   .countdown,
   .ball-fly,
-  .results-kicker,
+  .results > *,
+  .dna-helix .strand,
   .dna-fill {
     animation: none;
   }
