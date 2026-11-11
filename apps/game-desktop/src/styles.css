@@ -57,20 +57,11 @@ body,
   background: radial-gradient(ellipse at center, rgb(11 18 32 / 0.55), rgb(11 18 32 / 0.85));
 }
 
-/* CAPTAIN logo on a dark glass plate with a brand-blue edge. */
 .wordmark {
   display: inline-flex;
   align-self: flex-start;
   width: fit-content;
-  align-items: center;
-  padding: 0.5em 0.9em;
   font-size: clamp(24px, 3vw, 56px);
-  background: linear-gradient(180deg, rgba(22, 104, 214, 0.22), rgba(11, 18, 32, 0.85));
-  border: 1px solid rgba(22, 104, 214, 0.6);
-  border-left: 4px solid var(--blue);
-  border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
 }
 
 .wordmark-logo {
