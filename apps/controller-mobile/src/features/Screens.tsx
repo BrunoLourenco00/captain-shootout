@@ -1,4 +1,11 @@
-import type { ControllerView, GameConfig, NormalizedSwipe } from '@captain/game-protocol';
+import {
+  COACH_CTA,
+  coachLink,
+  coachPitch,
+  type ControllerView,
+  type GameConfig,
+  type NormalizedSwipe,
+} from '@captain/game-protocol';
 import { useState, type FormEvent } from 'react';
 import { useSwipe, type SwipeTrail } from '../gestures/useSwipe';
 
@@ -215,7 +222,26 @@ export function ResultsScreen({ view }: { view: ControllerView }) {
         </div>
       )}
       {r?.rank != null && <p className="rank">#{r.rank} ON THE LEADERBOARD</p>}
+      <CoachCard score={r?.score ?? view.score} />
       <p className="fineprint">📸 Take a screenshot to keep your score!</p>
     </main>
+  );
+}
+
+/** Where "Train with Coach Cap" leads (CAPTAIN app page). Overridable per deploy. */
+const COACH_URL = import.meta.env.VITE_COACH_URL || 'https://trycaptain.app';
+
+/** End-of-round pitch for Coach Cap, CAPTAIN's AI coach. */
+function CoachCard({ score }: { score: number }) {
+  const pitch = coachPitch(score);
+  return (
+    <section className="coach-card" aria-label="Coach Cap">
+      <span className="coach-kicker">AI COACH</span>
+      <h2>{pitch.headline}</h2>
+      <p>{pitch.body}</p>
+      <a className="coach-cta" href={coachLink(COACH_URL)} target="_blank" rel="noreferrer">
+        {COACH_CTA}
+      </a>
+    </section>
   );
 }

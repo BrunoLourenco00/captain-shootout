@@ -418,3 +418,52 @@ body,
     animation: none;
   }
 }
+
+/* Coach Cap pitch on the results screen */
+.coach-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 18px 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgb(22 104 214 / 0.6);
+  background: linear-gradient(160deg, rgb(22 104 214 / 0.28), rgb(11 18 32 / 0.6));
+  text-align: left;
+}
+
+.coach-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  color: var(--blue);
+}
+
+.coach-card h2 {
+  margin: 6px 0 6px;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.coach-card p {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--border);
+}
+
+.coach-cta {
+  display: block;
+  min-height: 52px;
+  padding: 15px 16px;
+  border-radius: 14px;
+  background: var(--blue);
+  color: var(--light);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-decoration: none;
+}
+
+.coach-cta:active {
+  transform: scale(0.98);
+}

@@ -63,3 +63,10 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 
 - `Ctrl+Shift+X`: force reset to attract.
 - `Ctrl+Shift+D`: toggle demo mode (play with mouse/keyboard on the desktop, no phone).
+
+## Difficulty, clutch time and sponsors (2026-11-11)
+
+- **Levels by score** (`config.levels`): still hoop until 10 points; from 10 it sways left/right, faster and wider at 25, and also bobs at 45. Shots still aim at the regulation spot, so players must lead the moving hoop.
+- **Clutch time**: shots taken in the last 10 s are worth x2, stacking with the streak multiplier.
+- Arena branding: CAPTAIN wordmark in the key and on the LED boards; **DHIKA** as official sponsor (LED boards, banners, attract screen).
+- End of round: Coach Cap pitch (AI coach in the CAPTAIN app), tone by score; the phone shows a "Train with Coach Cap" button to `VITE_COACH_URL` (default `https://trycaptain.app`, tagged `utm_source=shootout`).

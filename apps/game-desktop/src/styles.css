@@ -538,3 +538,49 @@ body,
   font-size: 14px;
   pointer-events: none;
 }
+
+/* Sponsor badge on the attract screen */
+.sponsor-badge {
+  position: absolute;
+  right: 4vw;
+  bottom: 4vh;
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  font-size: clamp(11px, 0.9vw, 18px);
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  color: var(--border);
+  opacity: 0.9;
+}
+
+.sponsor-badge img {
+  height: clamp(36px, 5vh, 72px);
+  /* The logo is black on white: invert it and let "screen" drop the black background. */
+  filter: invert(1);
+  mix-blend-mode: screen;
+}
+
+/* Coach Cap pitch on the results screen */
+.coach-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 2vh;
+  padding: 1.2vh 2vw;
+  border-radius: 16px;
+  border: 1px solid rgb(22 104 214 / 0.6);
+  background: rgb(22 104 214 / 0.18);
+  text-align: center;
+}
+
+.coach-line strong {
+  font-size: clamp(18px, 2vw, 40px);
+  font-weight: 900;
+}
+
+.coach-line span {
+  font-size: clamp(12px, 1.1vw, 22px);
+  color: var(--border);
+}

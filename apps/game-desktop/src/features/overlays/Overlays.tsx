@@ -1,4 +1,4 @@
-import type { GameConfig, LeaderboardEntry } from '@captain/game-protocol';
+import { coachPitch, type GameConfig, type LeaderboardEntry } from '@captain/game-protocol';
 import { QRCodeSVG } from 'qrcode.react';
 import { isClutchTime, levelIndex } from '../../game/scoring/levels';
 import { accuracy, isOnFire } from '../../game/scoring/scoring';
@@ -72,6 +72,9 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
           <h1 className="cta">SCAN TO PLAY</h1>
           <p className="tagline">Scan. Swipe. Score.</p>
           <p className="muted">30 seconds. Swipe up on your phone to shoot.</p>
+          <p className="muted">
+            Score more and the hoop starts moving. Last 10 s: every basket x2.
+          </p>
         </div>
         {host.leaderboard.length > 0 && (
           <div className="attract-board">
@@ -80,9 +83,19 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
           </div>
         )}
       </div>
+      <SponsorBadge />
       {import.meta.env.DEV && (
         <p className="dev-hint">Dev: Ctrl+Shift+D demo · Ctrl+Shift+X reset</p>
       )}
+    </div>
+  );
+}
+
+function SponsorBadge() {
+  return (
+    <div className="sponsor-badge">
+      <span>OFFICIAL SPONSOR</span>
+      <img src="/brand/dhika.webp" alt="DHIKA" />
     </div>
   );
 }
@@ -223,7 +236,21 @@ export function ResultsOverlay({
       {state.mode === 'live' && (
         <LeaderboardList entries={leaderboard} highlight={state.nickname ?? undefined} />
       )}
+      {state.mode === 'live' && <CoachLine score={score} />}
       <p className="tagline">NEXT PLAYER IN {secondsLeft(state.statusEndsAt, now)}s</p>
+    </div>
+  );
+}
+
+/** Coach Cap pitch for the crowd; the player gets the button on their phone. */
+function CoachLine({ score }: { score: number }) {
+  const pitch = coachPitch(score);
+  return (
+    <div className="coach-line">
+      <strong>{pitch.headline}</strong>
+      <span>
+        Train with Coach Cap, the AI coach in the CAPTAIN app. Tap the button on your phone.
+      </span>
     </div>
   );
 }
