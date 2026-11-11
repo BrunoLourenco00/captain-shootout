@@ -228,7 +228,6 @@ export function ResultsScreen({
         </div>
         <span className="results-points">POINTS</span>
         {r?.rank != null && <RankPill rank={r.rank} players={r.players ?? null} />}
-        <p className="verdict-line">{verdict.line}</p>
       </section>
 
       {r && (
