@@ -1,5 +1,6 @@
 import type { GameConfig, LeaderboardEntry } from '@captain/game-protocol';
 import { QRCodeSVG } from 'qrcode.react';
+import { isClutchTime, levelIndex } from '../../game/scoring/levels';
 import { accuracy, isOnFire } from '../../game/scoring/scoring';
 import type { GameState, ShotFeedback } from '../../game/state/gameState';
 import type { HostSessionState } from '../../services/useHostSession';
@@ -108,29 +109,62 @@ export function CountdownOverlay({ endsAt }: { endsAt: number | null }) {
   );
 }
 
+/** How long the "CLUTCH TIME" banner stays in the middle of the screen. */
+const CLUTCH_BANNER_MS = 1800;
+
 export function Hud({ state, config }: { state: GameState; config: GameConfig }) {
   const now = useNow();
   const left = secondsLeft(state.roundEndsAt, now);
   const fire = isOnFire(state.score, config.scoring);
+  const level = levelIndex(state.score.score, config.levels) + 1;
+  const clutch = state.status === 'playing' && isClutchTime(now, state.roundEndsAt, config.clutch);
+  const clutchStartedAt =
+    state.roundEndsAt === null ? null : state.roundEndsAt - config.clutch.lastMs;
+  const showClutchBanner =
+    clutch && clutchStartedAt !== null && now - clutchStartedAt < CLUTCH_BANNER_MS;
+
   return (
     <div className="hud">
       <div className="hud-block">
         <span className="hud-label">PLAYER</span>
-        <span className="hud-value">{state.nickname}</span>
+        <span className="hud-value hud-name">{state.nickname}</span>
+        <span className={`level-badge level-${level}`}>LEVEL {level}</span>
         {state.mode === 'live' && !state.controllerConnected && (
           <span className="phone-lost">📱 PHONE DISCONNECTED</span>
         )}
       </div>
-      <div className={`hud-block hud-time ${left <= 5 ? 'urgent' : ''}`}>
-        <span className="hud-label">TIME</span>
-        <span className="hud-value">{left}</span>
+      <div className="hud-scorebug">
+        <div className={`hud-block hud-time ${left <= 5 ? 'urgent' : ''}`}>
+          <span className="hud-label">TIME</span>
+          <span className="hud-value">{left}</span>
+          {clutch && <span className="clutch-pill">CLUTCH x{config.clutch.multiplier}</span>}
+        </div>
+        <div className="hud-block hud-right">
+          <span className="hud-label">SCORE</span>
+          <span className="hud-value">{state.score.score}</span>
+          {fire && <span className="streak">🔥 x{config.scoring.streakMultiplier}</span>}
+        </div>
       </div>
-      <div className="hud-block hud-right">
-        <span className="hud-label">SCORE</span>
-        <span className="hud-value">{state.score.score}</span>
-        {fire && <span className="streak">🔥 x{config.scoring.streakMultiplier}</span>}
-      </div>
+      {showClutchBanner && (
+        <div className="clutch-banner">
+          CLUTCH TIME <span>EVERY BASKET x{config.clutch.multiplier}</span>
+        </div>
+      )}
       {state.status === 'finished' && <div className="buzzer">TIME!</div>}
+    </div>
+  );
+}
+
+/** Camera flash + big level number when a basket takes the player to a new level. */
+export function LevelUpFlash({ feedback }: { feedback: ShotFeedback | null }) {
+  if (!feedback?.levelUp) return null;
+  return (
+    <div key={feedback.seq} className="level-up">
+      <div className="level-up-flash" />
+      <div className="level-up-text">
+        LEVEL {feedback.levelUp}
+        <span>THE HOOP IS MOVING</span>
+      </div>
     </div>
   );
 }
@@ -146,6 +180,7 @@ export function FeedbackPop({ feedback }: { feedback: ShotFeedback | null }) {
         <span className="feedback-points">
           +{feedback.points}
           {feedback.multiplied && ' 🔥'}
+          {feedback.clutch && <em className="feedback-clutch"> CLUTCH</em>}
         </span>
       )}
     </div>

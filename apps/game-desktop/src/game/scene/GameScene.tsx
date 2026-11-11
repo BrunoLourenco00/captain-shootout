@@ -7,7 +7,9 @@ import { BRAND } from '../../app/brand';
 import { CAMERA, GRAVITY, HOOP } from '../physics/courtGeometry';
 import type { HoopMotionTarget } from '../physics/liveHoop';
 import type { ActiveBall } from '../state/gameState';
+import { Arena } from './Arena';
 import { Ball } from './Ball';
+import { Confetti } from './Confetti';
 import { Court } from './Court';
 import { Hoop } from './Hoop';
 
@@ -66,6 +68,8 @@ export interface GameSceneProps {
   onFire: boolean;
   /** Increments on every basket. */
   basketSeq: number;
+  /** Increments on every perfect basket (confetti). */
+  perfectSeq: number;
 }
 
 export function GameScene({
@@ -76,6 +80,7 @@ export function GameScene({
   hoopMotion,
   onFire,
   basketSeq,
+  perfectSeq,
 }: GameSceneProps) {
   return (
     <Canvas
@@ -92,6 +97,7 @@ export function GameScene({
       <CameraRig />
       <Lights />
       <Suspense fallback={null}>
+        <Arena />
         <Physics gravity={[0, -GRAVITY, 0]} timeStep={1 / 120}>
           <Court />
           <Hoop motion={hoopMotion} active={roundActive} onFire={onFire} basketSeq={basketSeq} />
@@ -99,6 +105,7 @@ export function GameScene({
             <Ball key={ball.shotId} ball={ball} onResolve={onResolve} onRemove={onRemove} />
           ))}
         </Physics>
+        <Confetti seq={perfectSeq} />
       </Suspense>
     </Canvas>
   );

@@ -10,6 +10,7 @@ import {
   CountdownOverlay,
   FeedbackPop,
   Hud,
+  LevelUpFlash,
   ResultsOverlay,
 } from '../features/overlays/Overlays';
 import { GameScene } from '../game/scene/GameScene';
@@ -64,6 +65,7 @@ export function App() {
   const inRound = state.status === 'playing' || state.status === 'finished';
   const roundActive = state.status === 'countdown' || inRound;
   const basketSeq = state.feedback && state.feedback.outcome !== 'missed' ? state.feedback.seq : 0;
+  const perfectSeq = state.feedback?.outcome === 'perfect' ? state.feedback.seq : 0;
 
   return (
     <div className="stage">
@@ -75,13 +77,16 @@ export function App() {
         hoopMotion={levelFor(state.score.score, config.levels)}
         onFire={inRound && isOnFire(state.score, config.scoring)}
         basketSeq={basketSeq}
+        perfectSeq={perfectSeq}
       />
       {state.status === 'attract' && <AttractOverlay host={host} />}
       {state.status === 'connected' && <ConnectedOverlay nickname={state.nickname ?? ''} />}
       {state.status === 'countdown' && <CountdownOverlay endsAt={state.statusEndsAt} />}
       {inRound && <Hud state={state} config={config} />}
       {!host.online && host.configured && <div className="net-badge">OFFLINE · RECONNECTING</div>}
-      {inRound && <FeedbackPop feedback={state.feedback} />}
+      {/* A level-up has its own big message: it replaces the shot pop for that basket. */}
+      {inRound && !state.feedback?.levelUp && <FeedbackPop feedback={state.feedback} />}
+      {inRound && <LevelUpFlash feedback={state.feedback} />}
       {state.status === 'results' && (
         <ResultsOverlay state={state} leaderboard={host.leaderboard} />
       )}
