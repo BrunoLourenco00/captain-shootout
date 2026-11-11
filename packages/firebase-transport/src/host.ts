@@ -49,8 +49,11 @@ const CLOSED_SESSION_TTL_MS = 20_000;
  * (see firestore.rules); without them it signs in anonymously (sessions only).
  */
 async function signInHost(auth: Auth, kiosk: KioskCredentials | null, emulator: boolean) {
-  if (auth.currentUser) return auth.currentUser;
-  if (!kiosk) return (await signInAnonymously(auth)).user;
+  const user = auth.currentUser;
+  if (!kiosk) return user ?? (await signInAnonymously(auth)).user;
+  // A persisted session is reused only if it is already the kiosk account (an older
+  // anonymous session would silently lose the right to write the leaderboard).
+  if (user && user.email?.toLowerCase() === kiosk.email.toLowerCase()) return user;
   try {
     return (await signInWithEmailAndPassword(auth, kiosk.email, kiosk.password)).user;
   } catch (error) {

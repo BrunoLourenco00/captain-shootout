@@ -33,8 +33,11 @@ VITE_FIREBASE_APP_ID=...
 # URL encoded in the QR code: the deployed controller.
 VITE_CONTROLLER_BASE_URL=https://challenge.trycaptain.app   # or https://captain-shootout.web.app
 VITE_KIOSK_EMAIL=main@trycaptain.app
-VITE_KIOSK_PASSWORD=<kiosk password>
+VITE_KIOSK_PASSWORD='<kiosk password>'   # keep the quotes: an unquoted # starts a comment
 ```
+
+A freshly deployed Firestore index takes a few minutes to build; until then TOP SCORES
+stays empty (it reloads on every attract screen).
 
 Without kiosk credentials the desktop signs in anonymously: rounds work, but results
 are not saved (Firestore rules reject the write) and no rank is shown.

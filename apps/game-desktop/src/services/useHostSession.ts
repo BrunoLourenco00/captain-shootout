@@ -126,14 +126,15 @@ export function useHostSession(
     return () => window.removeEventListener('pagehide', close);
   }, []);
 
-  // Leaderboard: load on start, save each finished live round.
+  // Leaderboard: (re)load on every attract screen, save each finished live round.
+  const onAttract = state.status === 'attract';
   useEffect(() => {
-    if (!backend) return;
+    if (!backend || !onAttract) return;
     void backend.leaderboard
       .top(LEADERBOARD_SIZE)
       .then(setLeaderboard)
       .catch(() => {});
-  }, []);
+  }, [onAttract]);
 
   const savedRound = useRef<string | null>(null);
   useEffect(() => {
@@ -143,13 +144,17 @@ export function useHostSession(
     if (savedRound.current === roundId) return;
     savedRound.current = roundId;
     const { score, baskets, shots } = state.score;
-    store
-      .submit({ nickname: state.nickname, score, baskets, shots, completedAt: Date.now() })
-      .then(({ rank }) => {
+    store.submit({ nickname: state.nickname, score, baskets, shots, completedAt: Date.now() }).then(
+      ({ rank }) => {
         dispatch({ type: 'RESULT_SAVED', rank });
-        return store.top(LEADERBOARD_SIZE).then(setLeaderboard);
-      })
-      .catch(() => dispatch({ type: 'RESULT_SAVED', rank: null }));
+        // A failed refresh must not erase the rank that was just saved.
+        store
+          .top(LEADERBOARD_SIZE)
+          .then(setLeaderboard)
+          .catch(() => {});
+      },
+      () => dispatch({ type: 'RESULT_SAVED', rank: null }),
+    );
   }, [
     state.status,
     state.mode,
