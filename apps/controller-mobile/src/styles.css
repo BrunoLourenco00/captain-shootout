@@ -337,8 +337,9 @@ body,
   --tier: var(--r-glow);
   justify-content: flex-start;
   align-items: stretch;
-  gap: 20px;
-  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  gap: 16px;
+  padding: max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom));
+  overflow-x: clip;
   font-family: 'Barlow', 'Inter', system-ui, sans-serif;
   color: var(--r-fg);
   text-align: center;
@@ -388,7 +389,7 @@ body,
 }
 
 .results-logo {
-  height: 22px;
+  height: 19px;
   width: auto;
 }
 
@@ -413,15 +414,15 @@ body,
 }
 
 .results-kicker {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.2em;
   color: var(--tier);
 }
 
 .final {
   font-family: var(--display);
-  font-size: 144px;
+  font-size: 72px;
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -429,20 +430,20 @@ body,
 }
 
 .results-points {
-  margin-top: -8px;
-  font-size: 14px;
+  margin-top: -4px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.2em;
   color: var(--r-muted);
 }
 
 .rank {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   padding: 8px 16px;
   border-radius: 999px;
   background: var(--r-gradient);
   box-shadow: var(--r-shadow);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -450,8 +451,8 @@ body,
 
 .verdict-line {
   max-width: 320px;
-  margin: 12px 0 0;
-  font-size: 14px;
+  margin: 10px 0 0;
+  font-size: 13px;
   line-height: 1.4;
   color: var(--r-muted);
 }
@@ -466,7 +467,7 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 0;
+  padding: 10px 0;
   border-radius: 16px;
   border: 1px solid var(--r-line);
   background: color-mix(in oklab, var(--r-card) 70%, transparent);
@@ -474,7 +475,7 @@ body,
 
 .stats strong {
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -488,7 +489,7 @@ body,
 
 /* Player DNA */
 .dna-card {
-  padding: 20px;
+  padding: 16px;
   border-radius: 24px;
   border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
   background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
@@ -504,9 +505,10 @@ body,
 
 .dna-head h2 {
   margin: 0;
+  min-width: 0;
   white-space: nowrap;
   font-family: var(--display);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.025em;
 }
@@ -548,17 +550,17 @@ body,
 
 .dna-bars {
   list-style: none;
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .dna-bars li {
   display: grid;
-  grid-template-columns: 2.5rem 1fr 2rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr) 1.75rem;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .dna-bars abbr {
@@ -598,12 +600,12 @@ body,
 }
 
 .dna-gene {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   padding: 12px;
   border-radius: 12px;
   background: color-mix(in oklab, var(--r-accent) 10%, transparent);
-  font-size: 14px;
-  line-height: 1.43;
+  font-size: 13px;
+  line-height: 1.375;
 }
 
 .dna-gene b {
@@ -615,13 +617,13 @@ body,
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 12px;
+  gap: 10px;
 }
 
 .coach-closer h2 {
   margin: 0;
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.25;
 }
@@ -633,21 +635,21 @@ body,
 
 .coach-closer p {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.43;
   color: var(--r-muted);
 }
 
 .coach-cta {
   display: block;
-  padding: 16px;
+  padding: 14px 16px;
   border-radius: 16px;
   background: var(--r-gradient);
   box-shadow: var(--r-shadow);
   color: var(--light);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.025em;
   text-decoration: none;
   transition: transform 0.15s;
 }
@@ -663,10 +665,61 @@ body,
 
 .results-footer {
   margin: 0;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--r-line);
   font-size: 12px;
   color: var(--r-muted);
+}
+
+/* Wider phones and up: the roomier sizes of the design. */
+@media (min-width: 640px) {
+  .results {
+    padding-inline: 16px;
+  }
+
+  .results-kicker {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+  }
+
+  .final {
+    font-size: 96px;
+  }
+
+  .results-points {
+    font-size: 14px;
+    letter-spacing: 0.3em;
+  }
+
+  .rank {
+    font-size: 14px;
+  }
+
+  .stats strong {
+    font-size: 30px;
+  }
+
+  .dna-card {
+    padding: 20px;
+  }
+
+  .dna-head h2 {
+    font-size: 24px;
+  }
+
+  .dna-gene,
+  .coach-closer p {
+    font-size: 14px;
+  }
+
+  .coach-closer h2 {
+    font-size: 30px;
+  }
+
+  .coach-cta {
+    font-size: 16px;
+    letter-spacing: 0.1em;
+  }
 }
 
 @keyframes rise {
