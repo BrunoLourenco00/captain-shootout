@@ -57,31 +57,26 @@ body,
   background: radial-gradient(ellipse at center, rgb(11 18 32 / 0.55), rgb(11 18 32 / 0.85));
 }
 
+/* CAPTAIN logo on a dark glass plate with a brand-blue edge. */
 .wordmark {
-  display: flex;
+  display: inline-flex;
+  align-self: flex-start;
+  width: fit-content;
   align-items: center;
-  gap: 0.4em;
+  padding: 0.5em 0.9em;
   font-size: clamp(24px, 3vw, 56px);
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  font-style: italic;
+  background: linear-gradient(180deg, rgba(22, 104, 214, 0.22), rgba(11, 18, 32, 0.85));
+  border: 1px solid rgba(22, 104, 214, 0.6);
+  border-left: 4px solid var(--blue);
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
 }
 
-/* The real CAPTAIN logo (white with the blue "AI"), sized to the text's cap height. */
 .wordmark-logo {
-  height: 0.74em;
+  height: 0.9em;
   width: auto;
   display: block;
-}
-
-/* "SHOOTOUT" follows the logo: upright, medium weight, wide tracking, logo blue,
-   cap height matched to the logo's letters. */
-.wordmark span {
-  color: var(--blue);
-  font-style: normal;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  line-height: 1;
 }
 
 .muted {

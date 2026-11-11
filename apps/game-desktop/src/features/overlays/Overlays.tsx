@@ -14,7 +14,6 @@ function Wordmark() {
   return (
     <div className="wordmark">
       <img className="wordmark-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
-      <span>SHOOTOUT</span>
     </div>
   );
 }
