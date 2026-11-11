@@ -11,20 +11,26 @@ import {
 import { useEffect, useState, type FormEvent } from 'react';
 import { useSwipe, type SwipeTrail } from '../gestures/useSwipe';
 
-export function Wordmark() {
+/** Same top bar on every screen: the CAPTAIN logo, plus the player's name once known. */
+export function ScreenHeader({ nickname }: { nickname?: string }) {
   return (
-    <div className="wordmark">
-      CAPTAIN <span>SHOOTOUT</span>
-    </div>
+    <header className="screen-head">
+      <img className="screen-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
+      {nickname && <span className="screen-player">{nickname}</span>}
+    </header>
   );
 }
 
 export function MessageScreen({ title, body }: { title: string; body: string }) {
   return (
-    <main className="screen center">
-      <Wordmark />
-      <h1 className="title">{title}</h1>
-      <p className="body">{body}</p>
+    <main className="screen">
+      <ScreenHeader />
+      <section className="screen-hero">
+        <span className="kicker">CAPTAIN SHOOTOUT</span>
+        <h1 className="title">{title}</h1>
+        <p className="body">{body}</p>
+      </section>
+      <p className="screen-footer">45 seconds · swipe to shoot</p>
     </main>
   );
 }
@@ -47,8 +53,12 @@ export function NicknameScreen({
   }
   return (
     <main className="screen">
-      <Wordmark />
-      <form className="stack" onSubmit={submit}>
+      <ScreenHeader />
+      <section className="screen-hero">
+        <span className="kicker">CAPTAIN SHOOTOUT</span>
+        <h1 className="title">PICK YOUR NAME</h1>
+      </section>
+      <form className="card stack" onSubmit={submit}>
         <label className="label" htmlFor="nickname">
           YOUR NICKNAME
         </label>
@@ -68,13 +78,13 @@ export function NicknameScreen({
           aria-describedby={error ? 'nickname-error' : undefined}
         />
         <p id="nickname-error" className="error" role="alert">
-          {error ?? ' '}
+          {error ?? ' '}
         </p>
         <button className="button" type="submit" disabled={busy || value.trim().length === 0}>
           {busy ? 'JOINING…' : 'JOIN GAME'}
         </button>
       </form>
-      <p className="fineprint">Your nickname appears on the public leaderboard.</p>
+      <p className="screen-footer">Your nickname appears on the public leaderboard.</p>
     </main>
   );
 }
@@ -82,12 +92,12 @@ export function NicknameScreen({
 export function ReadyScreen({ nickname, onReady }: { nickname: string; onReady: () => void }) {
   return (
     <main className="screen">
-      <Wordmark />
-      <div className="stack center">
-        <p className="label">WELCOME</p>
+      <ScreenHeader nickname={nickname} />
+      <section className="screen-hero">
+        <span className="kicker">WELCOME</span>
         <h1 className="name">{nickname}</h1>
-        <HowToPlay />
-      </div>
+      </section>
+      <HowToPlay />
       <button className="button big" onClick={onReady}>
         READY
       </button>
@@ -97,24 +107,41 @@ export function ReadyScreen({ nickname, onReady }: { nickname: string; onReady: 
 
 function HowToPlay() {
   return (
-    <ol className="howto">
-      <li>Look at the big screen.</li>
-      <li>
-        <strong>Swipe up</strong> to shoot. Not too short, not too long: find the sweet spot.
-      </li>
-      <li>Swipe a little left or right to aim.</li>
-      <li>45 seconds. Score as much as you can!</li>
-    </ol>
+    <section className="card" aria-label="How to play">
+      <h2 className="card-title">HOW TO PLAY</h2>
+      <ol className="howto">
+        <li>
+          <span>Look at the big screen.</span>
+        </li>
+        <li>
+          <span>
+            <strong>Swipe up</strong> to shoot. Not too short, not too long: find the sweet spot.
+          </span>
+        </li>
+        <li>
+          <span>Swipe a little left or right to aim.</span>
+        </li>
+        <li>
+          <span>
+            <strong>45 seconds.</strong> 5 in a row: x1.5. 10 in a row: x2.
+          </span>
+        </li>
+      </ol>
+    </section>
   );
 }
 
 export function CountdownScreen({ seconds }: { seconds: number }) {
   return (
-    <main className="screen center">
-      <p className="label">LOOK AT THE SCREEN</p>
-      <div key={seconds} className="countdown">
-        {seconds > 0 ? seconds : 'GO!'}
-      </div>
+    <main className="screen">
+      <ScreenHeader />
+      <section className="screen-hero">
+        <span className="kicker">LOOK AT THE BIG SCREEN</span>
+        <div key={seconds} className="countdown">
+          {seconds > 0 ? seconds : 'GO!'}
+        </div>
+      </section>
+      <p className="screen-footer">Get your thumb ready</p>
     </main>
   );
 }
@@ -141,13 +168,13 @@ export function PlayScreen({
     <main className="screen play">
       <header className="play-hud">
         <div>
-          <span className="label">TIME</span>
+          <span>TIME</span>
           <strong className={view.secondsLeft <= 5 ? 'urgent' : undefined}>
             {view.secondsLeft}
           </strong>
         </div>
         <div className="right">
-          <span className="label">SCORE</span>
+          <span>SCORE</span>
           <strong>{view.score}</strong>
           {view.onFire && <span className="fire">🔥 x{view.multiplier ?? 2}</span>}
         </div>
@@ -213,13 +240,10 @@ export function ResultsScreen({
   const shown = useCountUp(score);
   return (
     <main className={`screen results tier-${verdict.tier}`}>
-      <header className="results-head">
-        <img className="results-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
-        <span className="results-player">{view.nickname}</span>
-      </header>
+      <ScreenHeader nickname={view.nickname} />
 
       <section className="results-hero" aria-label={`${score} points`}>
-        <span className="results-kicker">{verdict.title}</span>
+        <span className="kicker tier">{verdict.title}</span>
         <div className="final" aria-hidden>
           {shown}
         </div>
@@ -246,7 +270,7 @@ export function ResultsScreen({
 
       {r?.dna && <DnaCard dna={r.dna} />}
 
-      <p className="results-footer">
+      <p className="screen-footer">
         {sessionClosed
           ? 'Want a rematch? Scan the new QR code on the big screen.'
           : '📸 Screenshot this to keep your score!'}
