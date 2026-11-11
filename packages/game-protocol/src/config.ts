@@ -1,3 +1,5 @@
+import type { StreakTier } from './streak';
+
 /**
  * Tunable game settings. Everything the team may want to change on event day lives here.
  * See docs/DECISIONS.md for the agreed values.
@@ -16,14 +18,8 @@ export interface GameConfig {
     basketPoints: number;
     /** Basket without touching the rim. */
     perfectPoints: number;
-    /** The Nth consecutive basket (and every one after) is multiplied. */
-    streakThreshold: number;
-    streakMultiplier: number;
-  };
-  /** Last stretch of the round where every basket is multiplied (stacks with streaks). */
-  clutch: {
-    lastMs: number;
-    multiplier: number;
+    /** Consecutive-basket multipliers; the highest tier reached applies until a miss. */
+    streakTiers: StreakTier[];
   };
   /**
    * Difficulty by score: the hoop sways left/right (and later bobs) faster the better
@@ -65,12 +61,10 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   scoring: {
     basketPoints: 2,
     perfectPoints: 3,
-    streakThreshold: 5,
-    streakMultiplier: 2,
-  },
-  clutch: {
-    lastMs: 10_000,
-    multiplier: 2,
+    streakTiers: [
+      { minStreak: 5, multiplier: 1.5 },
+      { minStreak: 10, multiplier: 2 },
+    ],
   },
   levels: [
     { minScore: 0, hoopSwayM: 0, hoopBobM: 0, hoopPeriodMs: 4_000 },

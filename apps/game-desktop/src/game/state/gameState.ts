@@ -1,5 +1,11 @@
-import type { GameConfig, GameStatus, ShotCommand, ShotOutcome } from '@captain/game-protocol';
-import { isClutchTime, levelIndex } from '../scoring/levels';
+import {
+  streakMultiplier,
+  type GameConfig,
+  type GameStatus,
+  type ShotCommand,
+  type ShotOutcome,
+} from '@captain/game-protocol';
+import { levelIndex } from '../scoring/levels';
 import { EMPTY_SCORE, applyOutcome, recordAttempt, type ScoreState } from '../scoring/scoring';
 
 /** A ball the scene should simulate. Created only for accepted shots. */
@@ -17,9 +23,10 @@ export interface ShotFeedback {
   shotId: string;
   outcome: ShotOutcome;
   points: number;
-  multiplied: boolean;
-  /** The shot was taken in clutch time (points multiplied). */
-  clutch: boolean;
+  /** Streak multiplier applied to this basket (1 = none). */
+  multiplier: number;
+  /** The streak multiplier went up with this basket (e.g. 1.5 → 2), or null. */
+  multiplierUp: number | null;
   /** Level (1-based) reached with this basket, or null if the level did not change. */
   levelUp: number | null;
 }
@@ -124,14 +131,10 @@ function resolveBall(
   const ball = state.balls.find((b) => b.shotId === shotId);
   // Per-shot guard: a shot resolves exactly once.
   if (!ball || ball.resolved) return state;
-  // Clutch is decided by when the shot was taken, so a buzzer-beater still counts.
-  const clutch = isClutchTime(ball.firedAt, state.roundEndsAt, config.clutch);
-  const { state: score, points } = applyOutcome(
-    state.score,
-    outcome,
-    config.scoring,
-    clutch ? config.clutch.multiplier : 1,
-  );
+  const { state: score, points } = applyOutcome(state.score, outcome, config.scoring);
+  const tiers = config.scoring.streakTiers;
+  const multiplier = outcome === 'missed' ? 1 : streakMultiplier(score.streak, tiers);
+  const previous = streakMultiplier(state.score.streak, tiers);
   const levelBefore = levelIndex(state.score.score, config.levels);
   const levelAfter = levelIndex(score.score, config.levels);
   return {
@@ -143,8 +146,8 @@ function resolveBall(
       shotId,
       outcome,
       points,
-      multiplied: outcome !== 'missed' && score.streak >= config.scoring.streakThreshold,
-      clutch: clutch && outcome !== 'missed',
+      multiplier,
+      multiplierUp: multiplier > previous ? multiplier : null,
       levelUp: levelAfter > levelBefore ? levelAfter + 1 : null,
     },
   };

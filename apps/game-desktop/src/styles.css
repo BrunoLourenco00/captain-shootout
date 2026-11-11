@@ -203,23 +203,13 @@ body,
   border-color: var(--hot);
 }
 
-.clutch-pill {
-  margin-top: 0.3em;
-  padding: 0.2em 0.6em;
-  border-radius: 999px;
-  background: var(--light);
-  color: var(--dark);
-  font-weight: 900;
-  font-size: clamp(14px, 1.4vw, 28px);
-  animation: pulse 0.8s ease-in-out infinite;
-}
-
-.clutch-banner {
+.streak-banner {
   /* Centred with insets (not transform): the pop animation owns the transform. */
   position: fixed;
   left: 0;
   right: 0;
-  top: 30%;
+  top: 22%;
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -228,12 +218,30 @@ body,
   font-style: italic;
   color: var(--light);
   text-shadow:
-    0 0 40px rgb(22 104 214 / 0.9),
+    0 0 40px rgb(255 122 26 / 0.9),
     0 6px 30px rgb(0 0 0 / 0.6);
-  animation: pop 0.5s ease-out both;
+  animation: streak-banner 1.6s ease-out forwards;
 }
 
-.clutch-banner span {
+@keyframes streak-banner {
+  0% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  15% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.streak-banner span {
   font-size: 0.3em;
   letter-spacing: 0.2em;
   color: var(--hot);
@@ -277,9 +285,9 @@ body,
   color: var(--hot);
 }
 
-.feedback-clutch {
+.feedback-multiplier {
   font-style: normal;
-  color: var(--light);
+  color: var(--hot);
   -webkit-text-stroke: 0;
 }
 

@@ -12,6 +12,7 @@ import {
   Hud,
   LevelUpFlash,
   ResultsOverlay,
+  StreakBanner,
 } from '../features/overlays/Overlays';
 import { GameScene } from '../game/scene/GameScene';
 import { levelFor } from '../game/scoring/levels';
@@ -87,6 +88,8 @@ export function App() {
       {/* A level-up has its own big message: it replaces the shot pop for that basket. */}
       {inRound && !state.feedback?.levelUp && <FeedbackPop feedback={state.feedback} />}
       {inRound && <LevelUpFlash feedback={state.feedback} />}
+      {/* A level-up flash wins over the streak banner if both happen on one basket. */}
+      {inRound && !state.feedback?.levelUp && <StreakBanner feedback={state.feedback} />}
       {state.status === 'results' && (
         <ResultsOverlay state={state} leaderboard={host.leaderboard} />
       )}

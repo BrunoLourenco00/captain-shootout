@@ -6,7 +6,7 @@ import {
   type GameAction,
   type GameState,
 } from '../state/gameState';
-import { isClutchTime, levelIndex } from './levels';
+import { levelIndex } from './levels';
 
 const config = DEFAULT_GAME_CONFIG;
 const levels = config.levels;
@@ -26,18 +26,7 @@ describe('levelIndex', () => {
   });
 });
 
-describe('isClutchTime', () => {
-  it('covers only the last stretch of the round', () => {
-    const end = 33_000;
-    expect(isClutchTime(end - config.clutch.lastMs - 1, end, config.clutch)).toBe(false);
-    expect(isClutchTime(end - config.clutch.lastMs, end, config.clutch)).toBe(true);
-    expect(isClutchTime(end - 1, end, config.clutch)).toBe(true);
-    expect(isClutchTime(end, end, config.clutch)).toBe(false);
-    expect(isClutchTime(1000, null, config.clutch)).toBe(false);
-  });
-});
-
-describe('clutch time and level-up in the round', () => {
+describe('level-up in the round', () => {
   const reduce = makeGameReducer(config);
   const run = (state: GameState, ...actions: GameAction[]) => actions.reduce(reduce, state);
   const shot = (shotId: string): ShotCommand => ({
@@ -48,7 +37,7 @@ describe('clutch time and level-up in the round', () => {
     power: 0.5,
     clientTimestamp: 0,
   });
-  // Countdown 0-3 s, round 3-33 s, clutch from 23 s.
+  // Countdown 0-3 s, round 3-33 s.
   const playing = () =>
     run(
       createInitialState('S1'),
@@ -57,30 +46,19 @@ describe('clutch time and level-up in the round', () => {
       { type: 'TICK', now: 3000 },
     );
 
-  it('doubles a basket shot in clutch time, not one shot before it', () => {
-    const early = run(
-      playing(),
-      { type: 'SHOT', command: shot('a'), now: 22_000 },
-      { type: 'SHOT_RESOLVED', shotId: 'a', outcome: 'scored' },
-    );
-    expect(early.feedback).toMatchObject({ points: 2, clutch: false });
-
-    const late = run(
-      playing(),
-      { type: 'SHOT', command: shot('b'), now: 24_000 },
-      { type: 'SHOT_RESOLVED', shotId: 'b', outcome: 'perfect' },
-    );
-    expect(late.feedback).toMatchObject({ points: 6, clutch: true });
-    expect(late.score.score).toBe(6);
-  });
-
-  it('a clutch miss is not flagged as clutch', () => {
-    const s = run(
-      playing(),
-      { type: 'SHOT', command: shot('a'), now: 24_000 },
-      { type: 'SHOT_RESOLVED', shotId: 'a', outcome: 'missed' },
-    );
-    expect(s.feedback).toMatchObject({ points: 0, clutch: false });
+  it('announces the streak multiplier on the 5th and 10th basket in a row', () => {
+    let s = playing();
+    const ups: (number | null)[] = [];
+    for (let i = 0; i < 11; i++) {
+      s = run(
+        s,
+        { type: 'SHOT', command: shot(`s${i}`), now: 4000 + i * 1000 },
+        { type: 'SHOT_RESOLVED', shotId: `s${i}`, outcome: 'scored' },
+      );
+      ups.push(s.feedback?.multiplierUp ?? null);
+    }
+    expect(ups).toEqual([null, null, null, null, 1.5, null, null, null, null, 2, null]);
+    expect(s.feedback?.multiplier).toBe(2);
   });
 
   it('reports the new level once, on the basket that reaches it', () => {

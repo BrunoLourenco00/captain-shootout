@@ -32,7 +32,7 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 
 - Basket: **2 points**.
 - Swish (no rim contact): **3 points** ("PERFECT!").
-- **Streak:** from the 5th consecutive basket onwards, each basket is worth **×2** until a miss. A miss resets the streak.
+- **Streak:** from the 5th consecutive basket each basket is worth **×1.5**, from the 10th **×2**, until a miss. A miss resets the streak. Points are rounded to whole numbers (a perfect at ×1.5 is worth 5). Changed on 2026-11-11; it replaces the ×2-from-the-5th rule and clutch time.
 - All values live in config.
 
 ## Gameplay
@@ -64,9 +64,9 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 - `Ctrl+Shift+X`: force reset to attract.
 - `Ctrl+Shift+D`: toggle demo mode (play with mouse/keyboard on the desktop, no phone).
 
-## Difficulty, clutch time and sponsors (2026-11-11)
+## Difficulty and sponsors (2026-11-11)
 
 - **Levels by score** (`config.levels`): still hoop until 10 points; from 10 it sways left/right, faster and wider at 25, and also bobs at 45. Shots still aim at the regulation spot, so players must lead the moving hoop.
-- **Clutch time**: shots taken in the last 10 s are worth x2, stacking with the streak multiplier.
+- ~~Clutch time~~ (last 10 s worth x2) was tried and dropped the same day in favour of the two-step streak multiplier (see Scoring).
 - Arena branding: CAPTAIN wordmark in the key and on the LED boards; **DHIKA** as official sponsor (LED boards, banners, attract screen).
 - End of round: Coach Cap pitch (AI coach in the CAPTAIN app), tone by score; the phone shows a "Train with Coach Cap" button to `VITE_COACH_URL` (default `https://trycaptain.app`, tagged `utm_source=shootout`).

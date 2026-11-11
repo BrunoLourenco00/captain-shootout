@@ -1,5 +1,7 @@
 import {
   DEFAULT_GAME_CONFIG,
+  basketPoints,
+  streakMultiplier,
   type ConnectionState,
   type ControllerTransport,
   type ControllerView,
@@ -86,12 +88,13 @@ export function createMockTransport(config = DEFAULT_GAME_CONFIG): ControllerTra
         goodPower && goodAim ? (Math.random() < 0.5 ? 'perfect' : 'scored') : 'missed';
       later(1100, () => {
         streak = outcome === 'missed' ? 0 : streak + 1;
-        const base = outcome === 'perfect' ? 3 : outcome === 'scored' ? 2 : 0;
-        const points = streak >= config.scoring.streakThreshold ? base * 2 : base;
+        const points = basketPoints(outcome, streak, config.scoring);
+        const next = streakMultiplier(streak + 1, config.scoring.streakTiers);
         if (outcome !== 'missed') baskets += 1;
         publish({
           score: view.score + points,
-          onFire: streak + 1 >= config.scoring.streakThreshold,
+          onFire: next > 1,
+          multiplier: next,
           lastShot: {
             shotId: command.shotId,
             outcome,

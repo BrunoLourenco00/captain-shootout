@@ -1,6 +1,13 @@
 import { DEFAULT_GAME_CONFIG, type ShotOutcome } from '@captain/game-protocol';
 import { describe, expect, it } from 'vitest';
-import { EMPTY_SCORE, accuracy, applyOutcome, recordAttempt, type ScoreState } from './scoring';
+import {
+  EMPTY_SCORE,
+  accuracy,
+  applyOutcome,
+  nextMultiplier,
+  recordAttempt,
+  type ScoreState,
+} from './scoring';
 
 const scoring = DEFAULT_GAME_CONFIG.scoring;
 
@@ -21,11 +28,25 @@ describe('scoring', () => {
     expect(play(['scored', 'missed', 'perfect']).points).toEqual([2, 0, 3]);
   });
 
-  it('doubles from the 5th consecutive basket onwards', () => {
-    const { points, state } = play(['scored', 'scored', 'scored', 'scored', 'scored', 'perfect']);
-    expect(points).toEqual([2, 2, 2, 2, 4, 6]);
-    expect(state.score).toBe(18);
-    expect(state.bestStreak).toBe(6);
+  it('x1.5 from the 5th basket in a row, x2 from the 10th', () => {
+    const { points, state } = play([
+      ...Array<ShotOutcome>(4).fill('scored'),
+      'scored', // 5th: 2 x 1.5
+      'perfect', // 6th: 3 x 1.5 = 4.5, rounded to 5
+      ...Array<ShotOutcome>(3).fill('scored'),
+      'scored', // 10th: 2 x 2
+      'perfect', // 11th: 3 x 2
+    ]);
+    expect(points).toEqual([2, 2, 2, 2, 3, 5, 3, 3, 3, 4, 6]);
+    expect(state.score).toBe(35);
+    expect(state.bestStreak).toBe(11);
+  });
+
+  it('says which multiplier the next basket gets', () => {
+    const after = (n: number) => play(Array<ShotOutcome>(n).fill('scored')).state;
+    expect(nextMultiplier(after(3), scoring)).toBe(1);
+    expect(nextMultiplier(after(4), scoring)).toBe(1.5);
+    expect(nextMultiplier(after(9), scoring)).toBe(2);
   });
 
   it('a miss resets the streak', () => {

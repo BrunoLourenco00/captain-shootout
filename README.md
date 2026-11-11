@@ -10,7 +10,7 @@ Product and technical docs live in [`docs/`](docs/). **[`docs/DECISIONS.md`](doc
 apps/
   game-desktop/        Kiosk display: 3D scene, physics, authoritative state, HUD
     src/game/state/    Pure game reducer (state machine, shot validation, timer)
-    src/game/scoring/  Pure scoring rules (2 / 3 perfect / x2 streak)
+    src/game/scoring/  Pure scoring rules (2 / 3 perfect / x1.5 at 5 in a row, x2 at 10)
     src/game/physics/  Court geometry, shot velocity, basket detection (pure)
     src/game/scene/    React Three Fiber + Rapier scene
     src/features/      Overlays and HUD

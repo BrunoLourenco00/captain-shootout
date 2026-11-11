@@ -1,7 +1,7 @@
 import { coachPitch, type GameConfig, type LeaderboardEntry } from '@captain/game-protocol';
 import { QRCodeSVG } from 'qrcode.react';
-import { isClutchTime, levelIndex } from '../../game/scoring/levels';
-import { accuracy, isOnFire } from '../../game/scoring/scoring';
+import { levelIndex } from '../../game/scoring/levels';
+import { accuracy, nextMultiplier } from '../../game/scoring/scoring';
 import type { GameState, ShotFeedback } from '../../game/state/gameState';
 import type { HostSessionState } from '../../services/useHostSession';
 import { useNow } from '../useNow';
@@ -72,9 +72,6 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
           <h1 className="cta">SCAN TO PLAY</h1>
           <p className="tagline">Scan. Swipe. Score.</p>
           <p className="muted">30 seconds. Swipe up on your phone to shoot.</p>
-          <p className="muted">
-            Score more and the hoop starts moving. Last 10 s: every basket x2.
-          </p>
         </div>
         {host.leaderboard.length > 0 && (
           <div className="attract-board">
@@ -122,19 +119,11 @@ export function CountdownOverlay({ endsAt }: { endsAt: number | null }) {
   );
 }
 
-/** How long the "CLUTCH TIME" banner stays in the middle of the screen. */
-const CLUTCH_BANNER_MS = 1800;
-
 export function Hud({ state, config }: { state: GameState; config: GameConfig }) {
   const now = useNow();
   const left = secondsLeft(state.roundEndsAt, now);
-  const fire = isOnFire(state.score, config.scoring);
+  const multiplier = nextMultiplier(state.score, config.scoring);
   const level = levelIndex(state.score.score, config.levels) + 1;
-  const clutch = state.status === 'playing' && isClutchTime(now, state.roundEndsAt, config.clutch);
-  const clutchStartedAt =
-    state.roundEndsAt === null ? null : state.roundEndsAt - config.clutch.lastMs;
-  const showClutchBanner =
-    clutch && clutchStartedAt !== null && now - clutchStartedAt < CLUTCH_BANNER_MS;
 
   return (
     <div className="hud">
@@ -150,20 +139,25 @@ export function Hud({ state, config }: { state: GameState; config: GameConfig })
         <div className={`hud-block hud-time ${left <= 5 ? 'urgent' : ''}`}>
           <span className="hud-label">TIME</span>
           <span className="hud-value">{left}</span>
-          {clutch && <span className="clutch-pill">CLUTCH x{config.clutch.multiplier}</span>}
         </div>
         <div className="hud-block hud-right">
           <span className="hud-label">SCORE</span>
           <span className="hud-value">{state.score.score}</span>
-          {fire && <span className="streak">🔥 x{config.scoring.streakMultiplier}</span>}
+          {multiplier > 1 && <span className="streak">🔥 x{multiplier}</span>}
         </div>
       </div>
-      {showClutchBanner && (
-        <div className="clutch-banner">
-          CLUTCH TIME <span>EVERY BASKET x{config.clutch.multiplier}</span>
-        </div>
-      )}
       {state.status === 'finished' && <div className="buzzer">TIME!</div>}
+    </div>
+  );
+}
+
+/** Big banner when a streak reaches a new multiplier (x1.5 at 5 in a row, x2 at 10). */
+export function StreakBanner({ feedback }: { feedback: ShotFeedback | null }) {
+  if (!feedback?.multiplierUp) return null;
+  return (
+    <div key={feedback.seq} className="streak-banner">
+      ON FIRE x{feedback.multiplierUp}
+      <span>{feedback.multiplierUp >= 2 ? '10 IN A ROW' : '5 IN A ROW'}</span>
     </div>
   );
 }
@@ -176,7 +170,11 @@ export function LevelUpFlash({ feedback }: { feedback: ShotFeedback | null }) {
       <div className="level-up-flash" />
       <div className="level-up-text">
         LEVEL {feedback.levelUp}
-        <span>THE HOOP IS MOVING</span>
+        <span>
+          {feedback.multiplierUp
+            ? `THE HOOP IS MOVING · ON FIRE x${feedback.multiplierUp}`
+            : 'THE HOOP IS MOVING'}
+        </span>
       </div>
     </div>
   );
@@ -192,8 +190,9 @@ export function FeedbackPop({ feedback }: { feedback: ShotFeedback | null }) {
       {feedback.points > 0 && (
         <span className="feedback-points">
           +{feedback.points}
-          {feedback.multiplied && ' 🔥'}
-          {feedback.clutch && <em className="feedback-clutch"> CLUTCH</em>}
+          {feedback.multiplier > 1 && (
+            <em className="feedback-multiplier"> 🔥 x{feedback.multiplier}</em>
+          )}
         </span>
       )}
     </div>

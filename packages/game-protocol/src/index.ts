@@ -6,3 +6,4 @@ export * from './controller';
 export * from './host';
 export * from './coach';
 export * from './verdict';
+export * from './streak';

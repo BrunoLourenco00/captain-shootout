@@ -148,7 +148,7 @@ export function PlayScreen({
         <div className="right">
           <span className="label">SCORE</span>
           <strong>{view.score}</strong>
-          {view.onFire && <span className="fire">🔥 x2</span>}
+          {view.onFire && <span className="fire">🔥 x{view.multiplier ?? 2}</span>}
         </div>
       </header>
 

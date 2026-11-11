@@ -185,7 +185,7 @@ describe('resolution', () => {
     );
     expect(s.status).toBe('finished');
     s = run(s, { type: 'SHOT_RESOLVED', shotId: 'a', outcome: 'perfect' });
-    expect(s.score.score).toBe(6); // perfect (3) shot in clutch time (x2)
+    expect(s.score.score).toBe(3);
     s = run(s, { type: 'TICK', now: 33_100 });
     expect(s.status).toBe('results');
   });

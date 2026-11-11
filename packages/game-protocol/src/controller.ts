@@ -30,6 +30,8 @@ export interface ControllerView {
   secondsLeft: number;
   score: number;
   onFire: boolean;
+  /** Multiplier the next basket gets from the streak (1 = none). Missing from older desktops. */
+  multiplier?: number;
   lastShot: ShotResult | null;
   results: RoundSummary | null;
 }
