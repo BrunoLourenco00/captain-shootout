@@ -13,7 +13,8 @@ function secondsLeft(deadline: number | null, now: number): number {
 function Wordmark() {
   return (
     <div className="wordmark">
-      CAPTAIN <span>SHOOTOUT</span>
+      <img className="wordmark-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
+      <span>SHOOTOUT</span>
     </div>
   );
 }

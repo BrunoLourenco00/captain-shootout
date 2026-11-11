@@ -100,15 +100,17 @@ function drawContained(
 
 /**
  * Courtside LED board strip: CAPTAIN and DHIKA logos alternating on a dark blue band,
- * plus a short call to action. `segments` panels across the texture.
+ * plus a short call to action. The texture is drawn at the board's own aspect ratio
+ * (`aspect` = board width / height) so the logos are never stretched on the mesh.
  */
 export function ledBoardTexture(
   captain: HTMLImageElement,
   dhika: HTMLImageElement,
   segments: number,
+  aspect: number,
 ): CanvasTexture {
-  const segmentWidth = 512;
-  const height = 96;
+  const height = 128;
+  const segmentWidth = Math.round((height * aspect) / segments);
   const { el, ctx } = canvas(segmentWidth * segments, height);
   const dhikaWhite = whiteSilhouette(dhika);
 
@@ -122,15 +124,23 @@ export function ledBoardTexture(
     const box = { x, y: 0, w: segmentWidth, h: height };
     const kind = i % 3;
     if (kind === 0) {
-      drawContained(ctx, captain, box, 22);
+      drawContained(ctx, captain, box, 30);
     } else if (kind === 1) {
-      drawContained(ctx, dhikaWhite, box, 6);
+      drawContained(ctx, dhikaWhite, box, 10);
     } else {
       ctx.fillStyle = BRAND.light;
-      ctx.font = '900 italic 40px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('SCAN · SWIPE · SCORE', x + segmentWidth / 2, height / 2 + 2);
+      const text = 'SCAN · SWIPE · SCORE';
+      let size = 48;
+      ctx.font = `900 italic ${size}px system-ui, -apple-system, sans-serif`;
+      const maxWidth = segmentWidth * 0.86;
+      const measured = ctx.measureText(text).width;
+      if (measured > maxWidth) {
+        size = Math.floor((size * maxWidth) / measured);
+        ctx.font = `900 italic ${size}px system-ui, -apple-system, sans-serif`;
+      }
+      ctx.fillText(text, x + segmentWidth / 2, height / 2 + 2);
     }
     // Panel divider
     ctx.fillStyle = BRAND.blue;

@@ -58,10 +58,20 @@ body,
 }
 
 .wordmark {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
   font-size: clamp(24px, 3vw, 56px);
   font-weight: 900;
   letter-spacing: 0.08em;
   font-style: italic;
+}
+
+/* The real CAPTAIN logo (white with the blue "AI"), sized to the text's cap height. */
+.wordmark-logo {
+  height: 0.78em;
+  width: auto;
+  display: block;
 }
 
 .wordmark span {

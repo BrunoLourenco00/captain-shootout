@@ -15,22 +15,28 @@ const ROW_DEPTH = 0.85;
 const ROW_RISE = 0.55;
 const SEATS_PER_ROW = 46;
 const SEAT_SPACING = 0.55;
+const BASELINE_BOARD_WIDTH = 16;
+const SIDE_BOARD_WIDTH = 9;
 
 /** Courtside LED boards along the baseline and both sidelines. */
 function LedBoards() {
   const [captain, dhika] = useLoader(ImageLoader, [LOGO_URLS.captain, LOGO_URLS.dhika]);
   const [baseline, side] = useMemo(() => {
     if (!captain || !dhika) return [null, null];
-    return [ledBoardTexture(captain, dhika, 9), ledBoardTexture(captain, dhika, 6)];
+    // Panels of about 3.3:1 so each logo has room without being stretched.
+    return [
+      ledBoardTexture(captain, dhika, 6, BASELINE_BOARD_WIDTH / LED_HEIGHT),
+      ledBoardTexture(captain, dhika, 3, SIDE_BOARD_WIDTH / LED_HEIGHT),
+    ];
   }, [captain, dhika]);
   if (!baseline || !side) return null;
 
-  const sideLength = 9;
+  const sideLength = SIDE_BOARD_WIDTH;
   const sideZ = BASELINE_Z + sideLength / 2 - 0.4;
   return (
     <group>
       <mesh position={[0, LED_HEIGHT / 2, LED_Z]}>
-        <planeGeometry args={[16, LED_HEIGHT]} />
+        <planeGeometry args={[BASELINE_BOARD_WIDTH, LED_HEIGHT]} />
         <meshBasicMaterial map={baseline} toneMapped={false} />
       </mesh>
       {[-1, 1].map((side_) => (
