@@ -95,4 +95,5 @@ pnpm build
 - [x] Phase 3 — Firebase sessions, QR, real-time shots (verified on the emulators)
 - [x] Phase 4 — full loop, disconnect/resume, heartbeat, stale sessions
 - [x] Phase 5 — global leaderboard, rank, kiosk docs
-- [ ] Real project: deploy rules + controller, kiosk account, on-site smoke test
+- [x] Real project: rules + controller deployed (captain-shootout.web.app), kiosk account, remote smoke test
+- [ ] On-site check at the booth (hotspot, kiosk Mac, booth phone) — see `docs/KIOSK_CHECKLIST.md`

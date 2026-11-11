@@ -65,7 +65,10 @@ export function GameScene({ balls, onResolve, onRemove }: GameSceneProps) {
   return (
     <Canvas
       shadows
-      dpr={[1, 2]}
+      // The kiosk runs for hours: only the balls move, so with none in flight the static
+      // scene is redrawn on demand instead of every frame, and Retina is capped at 1.5x.
+      frameloop={balls.length > 0 ? 'always' : 'demand'}
+      dpr={[1, 1.5]}
       camera={{ position: CAMERA.position, fov: CAMERA.fov, near: 0.05, far: 80 }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
     >
