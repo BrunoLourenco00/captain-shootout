@@ -5,15 +5,22 @@
   --secondary: #526070;
   --border: #e1e7ef;
   --hot: #ff7a1a;
-  font-family:
-    'Inter',
-    'Helvetica Neue',
-    'Segoe UI',
-    system-ui,
-    -apple-system,
-    sans-serif;
-  color: var(--light);
-  background: var(--dark);
+  /* Same theme as the phone (Player DNA design). */
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --r-bg: oklch(14% 0.03 262);
+  --r-fg: oklch(97% 0.01 250);
+  --r-card: oklch(19% 0.04 262);
+  --r-primary: oklch(62% 0.19 258);
+  --r-glow: oklch(78% 0.15 230);
+  --r-muted: oklch(68% 0.04 255);
+  --r-accent: oklch(80% 0.17 65);
+  --r-line: oklch(100% 0 0 / 0.09);
+  --r-gradient: linear-gradient(135deg, var(--r-primary), var(--r-glow));
+  --r-shadow: 0 10px 40px -10px color-mix(in oklab, var(--r-primary) 60%, transparent);
+  --glow-text: 0 0 60px color-mix(in oklab, var(--r-glow) 45%, transparent);
+  font-family: 'Barlow', 'Inter', system-ui, sans-serif;
+  color: var(--r-fg);
+  background: var(--r-bg);
 }
 
 * {
@@ -54,7 +61,9 @@ body,
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: radial-gradient(ellipse at center, rgb(11 18 32 / 0.55), rgb(11 18 32 / 0.85));
+  background:
+    radial-gradient(80% 60% at 50% 0%, oklch(32% 0.12 260 / 0.55), transparent 60%),
+    radial-gradient(ellipse at center, oklch(14% 0.03 262 / 0.6), oklch(14% 0.03 262 / 0.9));
 }
 
 .wordmark {
@@ -71,18 +80,18 @@ body,
 }
 
 .muted {
-  color: var(--border);
-  opacity: 0.75;
+  color: var(--r-muted);
   letter-spacing: 0.2em;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0.4em 0;
   font-size: clamp(14px, 1.4vw, 28px);
 }
 
 .tagline {
   font-size: clamp(18px, 2vw, 40px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.06em;
+  color: var(--r-glow);
   margin: 0.4em 0;
 }
 
@@ -91,7 +100,7 @@ body,
   /* The card is centred by its auto margins, so it stays in the middle whether or
      not the dev hint is rendered (it is absent from the kiosk build). */
   justify-content: flex-start;
-  background: linear-gradient(90deg, rgb(11 18 32 / 0.9) 0%, rgb(11 18 32 / 0.2) 60%);
+  background: linear-gradient(90deg, oklch(14% 0.03 262 / 0.92) 0%, oklch(14% 0.03 262 / 0.2) 60%);
 }
 
 .attract-card {
@@ -109,10 +118,13 @@ body,
   color: var(--dark);
   display: grid;
   place-items: center;
-  box-shadow: 0 0 0 6px var(--blue);
+  box-shadow:
+    0 0 0 6px var(--r-primary),
+    0 0 80px -10px var(--r-glow);
 }
 
 .qr-pending {
+  font-family: var(--display);
   font-size: 48px;
   font-weight: 900;
   opacity: 0.25;
@@ -120,11 +132,12 @@ body,
 
 .cta {
   margin: 0;
-  font-size: clamp(40px, 6vw, 120px);
+  font-size: clamp(48px, 7vw, 140px);
   font-weight: 900;
-  font-style: italic;
+  font-family: var(--display);
   line-height: 0.95;
   letter-spacing: 0.02em;
+  text-shadow: var(--glow-text);
 }
 
 .dev-hint {
@@ -134,17 +147,21 @@ body,
 }
 
 .big-name {
-  font-size: clamp(48px, 8vw, 160px);
+  font-size: clamp(56px, 9vw, 180px);
   font-weight: 900;
-  font-style: italic;
+  line-height: 1;
+  text-shadow: var(--glow-text);
+  font-family: var(--display);
   margin: 0.1em 0;
 }
 
 /* Countdown */
 .countdown {
-  font-size: clamp(120px, 25vh, 320px);
+  font-size: clamp(160px, 32vh, 400px);
   font-weight: 900;
-  font-style: italic;
+  line-height: 1;
+  text-shadow: 0 0 80px color-mix(in oklab, var(--r-glow) 55%, transparent);
+  font-family: var(--display);
   animation: pop 0.9s ease-out;
 }
 
@@ -155,7 +172,7 @@ body,
   justify-content: space-between;
   align-items: flex-start;
   padding: 3vh 3vw;
-  background: linear-gradient(180deg, rgb(11 18 32 / 0.85), transparent);
+  background: linear-gradient(180deg, oklch(14% 0.03 262 / 0.85), transparent);
 }
 
 .hud-block {
@@ -190,15 +207,17 @@ body,
   margin-top: 0.4em;
   padding: 0.25em 0.8em;
   border-radius: 999px;
-  border: 2px solid var(--blue);
-  font-weight: 900;
+  border: 1px solid color-mix(in oklab, var(--r-primary) 60%, transparent);
+  font-family: var(--display);
+  font-weight: 800;
   letter-spacing: 0.12em;
-  font-size: clamp(13px, 1.3vw, 26px);
-  background: rgb(22 104 214 / 0.25);
+  font-size: clamp(15px, 1.5vw, 30px);
+  background: color-mix(in oklab, var(--r-primary) 25%, transparent);
 }
 
 .level-badge.level-3 {
-  background: var(--blue);
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
 }
 
 .level-badge.level-4 {
@@ -218,7 +237,7 @@ body,
   align-items: center;
   font-size: clamp(48px, 8vw, 160px);
   font-weight: 900;
-  font-style: italic;
+  font-family: var(--display);
   color: var(--light);
   text-shadow:
     0 0 40px rgb(255 122 26 / 0.9),
@@ -274,10 +293,10 @@ body,
   align-items: center;
   font-size: clamp(56px, 9vw, 180px);
   font-weight: 900;
-  font-style: italic;
-  color: var(--light);
+  font-family: var(--display);
+  color: var(--r-fg);
   text-shadow:
-    0 0 50px rgb(22 104 214 / 0.95),
+    0 0 50px var(--r-glow),
     0 6px 30px rgb(0 0 0 / 0.6);
   animation: level-up 1.8s ease-out forwards;
 }
@@ -324,20 +343,21 @@ body,
 .hud-label {
   font-size: clamp(12px, 1.1vw, 22px);
   letter-spacing: 0.25em;
-  font-weight: 700;
-  color: var(--border);
-  opacity: 0.75;
+  font-weight: 600;
+  color: var(--r-muted);
 }
 
 .hud-value {
-  font-size: clamp(32px, 4.5vw, 96px);
+  font-family: var(--display);
+  font-size: clamp(40px, 5.5vw, 116px);
   font-weight: 900;
+  text-shadow: var(--glow-text);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .hud-time .hud-value {
-  font-size: clamp(40px, 5.5vw, 112px);
+  font-size: clamp(48px, 6.5vw, 136px);
 }
 
 .hud-time.urgent .hud-value {
@@ -347,11 +367,13 @@ body,
 
 .streak {
   margin-top: 0.3em;
-  padding: 0.2em 0.6em;
+  padding: 0.15em 0.7em;
   border-radius: 999px;
   background: var(--hot);
+  font-family: var(--display);
   font-weight: 900;
-  font-size: clamp(16px, 1.6vw, 32px);
+  letter-spacing: 0.04em;
+  font-size: clamp(18px, 1.9vw, 38px);
 }
 
 .buzzer {
@@ -359,9 +381,9 @@ body,
   left: 50%;
   top: 40%;
   transform: translateX(-50%);
-  font-size: clamp(32px, 5vw, 96px);
+  font-size: clamp(40px, 6vw, 116px);
   font-weight: 900;
-  font-style: italic;
+  font-family: var(--display);
   color: var(--hot);
 }
 
@@ -370,9 +392,10 @@ body,
   left: 50%;
   top: 38%;
   transform: translate(-50%, -50%);
-  font-size: clamp(40px, 6vw, 120px);
+  font-size: clamp(48px, 7vw, 140px);
+  line-height: 1;
   font-weight: 900;
-  font-style: italic;
+  font-family: var(--display);
   text-shadow: 0 6px 30px rgb(0 0 0 / 0.5);
   animation: float-out 1.1s ease-out forwards;
   display: flex;
@@ -385,32 +408,33 @@ body,
 }
 
 .feedback-scored {
-  color: var(--light);
+  color: var(--r-fg);
 }
 
 .feedback-missed {
-  color: var(--secondary);
+  color: var(--r-muted);
   font-size: clamp(28px, 3.5vw, 72px);
 }
 
 .feedback-points {
   font-size: 0.55em;
-  color: var(--blue);
-  -webkit-text-stroke: 1px var(--light);
+  color: var(--r-glow);
 }
 
 /* Results */
 .final-score {
-  font-size: clamp(96px, 18vh, 260px);
+  font-size: clamp(120px, 22vh, 320px);
   font-weight: 900;
-  font-style: italic;
+  font-family: var(--display);
   margin: 0;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--glow-text);
 }
 
 .stats {
   display: flex;
-  gap: 4vw;
+  gap: 1.2vw;
   margin: 4vh 0;
 }
 
@@ -418,18 +442,25 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 11vw;
+  padding: 1.2vh 1.5vw;
+  border-radius: 20px;
+  border: 1px solid var(--r-line);
+  background: color-mix(in oklab, var(--r-card) 70%, transparent);
 }
 
 .stats strong {
-  font-size: clamp(32px, 4vw, 80px);
-  font-weight: 900;
+  font-family: var(--display);
+  font-size: clamp(40px, 4.5vw, 92px);
+  font-weight: 800;
+  line-height: 1.1;
 }
 
 .stats span {
   font-size: clamp(12px, 1vw, 20px);
+  font-weight: 600;
   letter-spacing: 0.2em;
-  color: var(--border);
-  opacity: 0.75;
+  color: var(--r-muted);
 }
 
 @keyframes pop {
@@ -514,9 +545,10 @@ body,
   gap: 0.8em;
   padding: 0.5em 0.9em;
   border-radius: 12px;
-  background: rgb(247 249 251 / 0.08);
+  border: 1px solid var(--r-line);
+  background: color-mix(in oklab, var(--r-card) 75%, transparent);
   font-size: clamp(16px, 1.5vw, 30px);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* Podium: gold, silver, bronze (dark text for contrast on the light fills). */
@@ -551,6 +583,9 @@ body,
 }
 
 .leaderboard .pts {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 1.15em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -558,9 +593,11 @@ body,
   margin: 0 0 1vh;
   padding: 0.3em 1em;
   border-radius: 999px;
-  background: var(--blue);
-  font-weight: 900;
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
+  font-weight: 700;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
   font-size: clamp(16px, 1.6vw, 32px);
 }
 
@@ -599,10 +636,9 @@ body,
   align-items: center;
   gap: 1vw;
   font-size: clamp(11px, 0.9vw, 18px);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.25em;
-  color: var(--border);
-  opacity: 0.9;
+  color: var(--r-muted);
 }
 
 .sponsor-badge img {
@@ -620,18 +656,20 @@ body,
   gap: 0.4em;
   margin-top: 2vh;
   padding: 1.2vh 2vw;
-  border-radius: 16px;
-  border: 1px solid rgb(22 104 214 / 0.6);
-  background: rgb(22 104 214 / 0.18);
+  border-radius: 24px;
+  border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
+  background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
   text-align: center;
 }
 
 .coach-line strong {
-  font-size: clamp(18px, 2vw, 40px);
-  font-weight: 900;
+  font-family: var(--display);
+  font-size: clamp(22px, 2.4vw, 48px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .coach-line span {
   font-size: clamp(12px, 1.1vw, 22px);
-  color: var(--border);
+  color: var(--r-muted);
 }

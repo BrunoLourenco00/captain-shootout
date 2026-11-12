@@ -10,7 +10,7 @@
 
 CAPTAIN SHOOTOUT is a short basketball challenge. The main computer displays a first-person 3D basketball court and hoop. The player uses their own smartphone as a wireless controller: they scan a QR code, connect to the game session, enter a nickname, and swipe on the phone to shoot.
 
-A round lasts **45 seconds**. The desktop renders the game and owns the authoritative game state and score. The phone sends shot inputs only.
+A round lasts **35 seconds**. The desktop renders the game and owns the authoritative game state and score. The phone sends shot inputs only.
 
 The experience should be:
 
@@ -47,7 +47,7 @@ Include safe transitions for:
 
 ## 3. Game rules
 
-- Round duration: **45 seconds**.
+- Round duration: **35 seconds**.
 - One active player/controller per game session.
 - A swipe sends one shot command.
 - The desktop determines whether a shot is valid and whether it scores.
@@ -182,7 +182,7 @@ The 3D environment should feel like a polished sports-performance experience, no
 - Real-time connection between phone and desktop.
 - Swipe-to-shoot interaction.
 - Ball physics and basket detection.
-- 45-second authoritative timer.
+- 35-second authoritative timer.
 - Score/results screen.
 - Automatic reset for the next player.
 - Basic leaderboard persistence.
@@ -216,7 +216,7 @@ The MVP is ready for a booth test when:
 5. The player can start a round.
 6. A swipe sends one command and launches a ball in the 3D scene.
 7. Basket detection updates the score exactly once per shot.
-8. The round ends automatically after 45 seconds.
+8. The round ends automatically after 35 seconds.
 9. Results and leaderboard are displayed.
 10. The game returns to attract mode without a page reload.
 11. An abandoned or disconnected session does not block the next player.
