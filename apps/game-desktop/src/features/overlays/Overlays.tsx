@@ -1,4 +1,9 @@
-import { coachPitch, type GameConfig, type LeaderboardEntry } from '@captain/game-protocol';
+import {
+  coachPitch,
+  DEFAULT_GAME_CONFIG,
+  type GameConfig,
+  type LeaderboardEntry,
+} from '@captain/game-protocol';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useRef } from 'react';
 import { levelIndex } from '../../game/scoring/levels';
@@ -178,6 +183,8 @@ function ScrollingBoard({ entries }: { entries: LeaderboardEntry[] }) {
   );
 }
 
+const ROUND_SECONDS = DEFAULT_GAME_CONFIG.roundDurationMs / 1000;
+
 export function AttractOverlay({ host }: { host: HostSessionState }) {
   return (
     <div className="overlay attract">
@@ -189,7 +196,7 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
         <div>
           <h1 className="cta">SCAN TO PLAY</h1>
           <p className="tagline">Scan. Swipe. Score.</p>
-          <p className="muted">45 seconds. Swipe up on your phone to shoot.</p>
+          <p className="muted">{ROUND_SECONDS} seconds. Swipe up on your phone to shoot.</p>
         </div>
         {host.leaderboard.length > 0 && (
           <div className="attract-board">

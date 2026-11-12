@@ -9,7 +9,7 @@ The experience uses two screens:
 - Desktop: public-facing 3D game, court, hoop, timer, score and leaderboard.
 - Mobile browser: player's controller. The player scans a QR code and swipes to shoot.
 
-Each round lasts 45 seconds. The desktop is authoritative for game state, physics, timer, basket detection and score. The phone sends input commands only.
+Each round lasts 35 seconds. The desktop is authoritative for game state, physics, timer, basket detection and score. The phone sends input commands only.
 
 Read these documents before making architectural or product decisions:
 
@@ -65,7 +65,7 @@ Treat these as the current proposal, not unquestionable requirements. Validate p
 
 ## Game rules and invariants
 
-- Round duration is 45 seconds.
+- Round duration is 35 seconds.
 - One active controller per session.
 - Desktop owns the authoritative clock and game state.
 - Accept shots only while the session is PLAYING.

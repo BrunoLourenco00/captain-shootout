@@ -1,4 +1,5 @@
 import {
+  DEFAULT_GAME_CONFIG,
   DNA_LABELS,
   DNA_ORDER,
   geneToUnlock,
@@ -12,6 +13,9 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useSwipe, type SwipeTrail } from '../gestures/useSwipe';
 
 /** Same top bar on every screen: the CAPTAIN logo, plus the player's name once known. */
+
+const ROUND_SECONDS = DEFAULT_GAME_CONFIG.roundDurationMs / 1000;
+
 export function ScreenHeader({ nickname }: { nickname?: string }) {
   return (
     <header className="screen-head">
@@ -30,7 +34,7 @@ export function MessageScreen({ title, body }: { title: string; body: string }) 
         <h1 className="title">{title}</h1>
         <p className="body">{body}</p>
       </section>
-      <p className="screen-footer">45 seconds · swipe to shoot</p>
+      <p className="screen-footer">{ROUND_SECONDS} seconds · swipe to shoot</p>
     </main>
   );
 }
@@ -362,7 +366,7 @@ function HowToPlay() {
         </li>
         <li>
           <span>
-            <strong>45 seconds.</strong> 5 in a row: x1.5. 10 in a row: x2.
+            <strong>{ROUND_SECONDS} seconds.</strong> 5 in a row: x1.5. 10 in a row: x2.
           </span>
         </li>
       </ol>
