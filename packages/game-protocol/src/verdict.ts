@@ -15,11 +15,11 @@ export interface RoundVerdict {
   line: string;
 }
 
-/** Score where each tier starts; they follow the hoop levels (10, 25, 45). */
+/** Score where each tier starts; they follow the hoop levels (8, 20, 35). */
 const TIERS: { tier: VerdictTier; minScore: number; title: string; lines: string[] }[] = [
   {
     tier: 'mvp',
-    minScore: 45,
+    minScore: 35,
     title: 'MVP',
     lines: [
       'The hoop ran away from you and it still did not matter.',
@@ -29,7 +29,7 @@ const TIERS: { tier: VerdictTier; minScore: number; title: string; lines: string
   },
   {
     tier: 'allstar',
-    minScore: 25,
+    minScore: 20,
     title: 'ALL-STAR',
     lines: [
       'You made the moving hoop look easy.',
@@ -39,7 +39,7 @@ const TIERS: { tier: VerdictTier; minScore: number; title: string; lines: string
   },
   {
     tier: 'starter',
-    minScore: 10,
+    minScore: 8,
     title: 'STARTER',
     lines: [
       'You got the hoop moving. Now keep up with it.',
@@ -73,7 +73,7 @@ const TIERS: { tier: VerdictTier; minScore: number; title: string; lines: string
 function specialLine(summary: RoundSummary): string | null {
   if (summary.rank === 1) return 'Number one on the leaderboard. Come back and defend it.';
   if (summary.shots >= 5 && summary.accuracy >= 0.8) return 'Sniper. Barely a miss all round.';
-  if (summary.shots >= 25 && summary.accuracy < 0.25)
+  if (summary.shots >= 20 && summary.accuracy < 0.25)
     return 'All gas, no brakes. Slow down and aim.';
   return null;
 }

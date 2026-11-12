@@ -68,9 +68,9 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   },
   levels: [
     { minScore: 0, hoopSwayM: 0, hoopBobM: 0, hoopPeriodMs: 4_000 },
-    { minScore: 10, hoopSwayM: 0.35, hoopBobM: 0, hoopPeriodMs: 4_200 },
-    { minScore: 25, hoopSwayM: 0.6, hoopBobM: 0, hoopPeriodMs: 3_200 },
-    { minScore: 45, hoopSwayM: 0.75, hoopBobM: 0.12, hoopPeriodMs: 2_600 },
+    { minScore: 8, hoopSwayM: 0.35, hoopBobM: 0, hoopPeriodMs: 4_200 },
+    { minScore: 20, hoopSwayM: 0.6, hoopBobM: 0, hoopPeriodMs: 3_200 },
+    { minScore: 35, hoopSwayM: 0.75, hoopBobM: 0.12, hoopPeriodMs: 2_600 },
   ],
   nickname: {
     minLength: 2,

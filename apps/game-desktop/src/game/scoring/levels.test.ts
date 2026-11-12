@@ -14,9 +14,10 @@ const levels = config.levels;
 describe('levelIndex', () => {
   it('starts still and climbs with the score thresholds', () => {
     expect(levelIndex(0, levels)).toBe(0);
-    expect(levelIndex(9, levels)).toBe(0);
-    expect(levelIndex(10, levels)).toBe(1);
-    expect(levelIndex(25, levels)).toBe(2);
+    expect(levelIndex(7, levels)).toBe(0);
+    expect(levelIndex(8, levels)).toBe(1);
+    expect(levelIndex(20, levels)).toBe(2);
+    expect(levelIndex(35, levels)).toBe(3);
     expect(levelIndex(1000, levels)).toBe(levels.length - 1);
   });
 
@@ -37,7 +38,7 @@ describe('level-up in the round', () => {
     power: 0.5,
     clientTimestamp: 0,
   });
-  // Countdown 0-3 s, round 3-33 s.
+  // Countdown 0-3 s, round 3-38 s.
   const playing = () =>
     run(
       createInitialState('S1'),
@@ -62,16 +63,16 @@ describe('level-up in the round', () => {
   });
 
   it('reports the new level once, on the basket that reaches it', () => {
-    // 3 + 3 + 3 = 9 (level 1), the 4th perfect makes 12 (level 2).
+    // 2 + 2 + 2 = 6 (level 1), the 4th basket makes 8 (level 2).
     let s = playing();
     for (const [i, id] of ['a', 'b', 'c', 'd'].entries()) {
       s = run(
         s,
         { type: 'SHOT', command: shot(id), now: 4000 + i * 1000 },
-        { type: 'SHOT_RESOLVED', shotId: id, outcome: 'perfect' },
+        { type: 'SHOT_RESOLVED', shotId: id, outcome: 'scored' },
       );
       expect(s.feedback?.levelUp).toBe(id === 'd' ? 2 : null);
     }
-    expect(s.score.score).toBe(12);
+    expect(s.score.score).toBe(8);
   });
 });

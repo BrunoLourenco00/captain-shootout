@@ -262,10 +262,10 @@ export const PREVIEWS: Preview[] = [
   {
     id: 'results-allstar',
     group: 'Results',
-    label: 'All-Star (33)',
+    label: 'All-Star (28)',
     render: () =>
       results({
-        score: 33,
+        score: 28,
         baskets: 12,
         shots: 18,
         accuracy: 0.67,
@@ -276,10 +276,10 @@ export const PREVIEWS: Preview[] = [
   {
     id: 'results-mvp',
     group: 'Results',
-    label: 'MVP (58)',
+    label: 'MVP (46)',
     render: () =>
       results({
-        score: 58,
+        score: 46,
         baskets: 19,
         shots: 24,
         accuracy: 0.79,
@@ -318,7 +318,7 @@ export const PREVIEWS: Preview[] = [
   {
     id: 'results-spam',
     group: 'Results',
-    label: 'Spammer (25+ shots, <25%)',
+    label: 'Spammer (20+ shots, <25%)',
     render: () =>
       results({
         score: 10,

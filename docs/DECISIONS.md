@@ -69,7 +69,7 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 
 ## Difficulty and sponsors (2026-11-11)
 
-- **Levels by score** (`config.levels`): still hoop until 10 points; from 10 it sways left/right, faster and wider at 25, and also bobs at 45. Shots still aim at the regulation spot, so players must lead the moving hoop.
+- **Levels by score** (`config.levels`): still hoop until 8 points; from 8 it sways left/right, faster and wider at 20, and also bobs at 35 (scaled from 10/25/45 for 35-second rounds). The phone tiers follow the same steps: Rookie 1+, Starter 8+, All-Star 20+, MVP 35+. Shots still aim at the regulation spot, so players must lead the moving hoop.
 - ~~Clutch time~~ (last 10 s worth x2) was tried and dropped the same day in favour of the two-step streak multiplier (see Scoring).
 - Arena branding: CAPTAIN wordmark in the key and on the LED boards; **DHIKA** as official sponsor (LED boards, banners, attract screen).
 - End of round: AI Coach pitch (the coach in the CAPTAIN app), tone by score; the phone shows a "Player DNA" from the round's shots (accuracy, volume, rhythm, clutch, stamina, computed by the desktop). No link or sign-up button on the phone for now: sign-up before playing is planned instead.
