@@ -285,6 +285,9 @@ importers:
       firebase:
         specifier: ^13.2.0
         version: 13.2.0(@types/react@19.3.0)(react@19.3.1)
+      jose:
+        specifier: 6.2.13
+        version: 6.2.13
     devDependencies:
       '@firebase/rules-unit-testing':
         specifier: ^6.0.0
@@ -1497,6 +1500,9 @@ packages:
     resolution: {integrity: sha512-C5ZoVkeqSt0Aje0tzESO+iT/EQpNFNL39GkP7mCACtoZUFD6GcyerFCr6kp0ZtiII4W9HoYkY48Soy5xE/uHKw==}
     peerDependencies:
       react: ^19.0.0
+
+  jose@6.2.13:
+    resolution: {integrity: sha512-7TIg10ZE1x82YediN+lcrPNvGMKge9yFHQD+Qho/b8y2adfugU3AsvvHfxV0fzyFllT6l9xCjf4RWY9g/Z9PJQ==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -3330,6 +3336,8 @@ snapshots:
       react: 19.3.1
     transitivePeerDependencies:
       - '@types/react'
+
+  jose@6.2.13: {}
 
   js-tokens@4.0.0: {}
 

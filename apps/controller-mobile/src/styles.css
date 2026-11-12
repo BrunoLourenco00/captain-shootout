@@ -119,6 +119,21 @@ body,
   color: var(--r-muted);
 }
 
+.results-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.site-link {
+  flex: none;
+  padding: 6px 0;
+  color: var(--r-glow);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .screen-hero + .screen-footer,
 .card + .screen-footer {
   margin-top: 0;
@@ -237,6 +252,143 @@ body,
 .button:disabled {
   opacity: 0.4;
   box-shadow: none;
+}
+
+/* Sign-in providers, as on trycaptain.app and in the app: 52 px, 18 px corners,
+   logo + 12 px gap. */
+.provider-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 1px solid var(--r-line);
+  border-radius: 18px;
+  background: var(--r-secondary);
+  color: var(--r-fg);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.provider-button:active {
+  transform: scale(0.98);
+}
+
+.provider-button:disabled {
+  opacity: 0.5;
+}
+
+.provider-icon {
+  flex: none;
+  width: 19px;
+  height: 19px;
+}
+
+/* "or continue with" between the email form and the providers. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--r-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--r-line);
+}
+
+.account-switch {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--r-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Text button. */
+.link {
+  padding: 10px 4px;
+  border: none;
+  background: none;
+  color: var(--r-glow);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.link:disabled {
+  opacity: 0.4;
+}
+
+.link.inline {
+  padding: 0;
+  font-size: inherit;
+}
+
+.link.guest {
+  align-self: center;
+  min-height: 44px;
+  font-size: 16px;
+  color: var(--r-fg);
+}
+
+/* Email/password: body font, not the display nickname style. */
+.input.plain {
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.terms {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--r-muted);
+}
+
+.terms input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--r-primary);
+}
+
+.terms a {
+  color: var(--r-fg);
+}
+
+.account-line {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--r-muted);
+  overflow-wrap: anywhere;
 }
 
 .button.big {
@@ -535,6 +687,13 @@ body,
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.rank.guest {
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid var(--r-line);
+  color: var(--r-muted);
 }
 
 .stats {

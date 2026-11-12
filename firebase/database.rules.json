@@ -15,7 +15,7 @@
         "controller": {
           ".read": "auth != null && (data.child('uid').val() === auth.uid || root.child('sessions/' + $sid + '/public/hostUid').val() === auth.uid)",
           ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('token').val() === root.child('sessions/' + $sid + '/secret/token').val() && root.child('sessions/' + $sid + '/public/status').val() === 'open'",
-          ".validate": "newData.hasChildren(['uid', 'nickname', 'token', 'joinedAt']) && newData.child('nickname').isString() && newData.child('nickname').val().length >= 2 && newData.child('nickname').val().length <= 16 && newData.child('joinedAt').isNumber()"
+          ".validate": "newData.hasChildren(['uid', 'nickname', 'token', 'joinedAt']) && newData.child('nickname').isString() && newData.child('nickname').val().length >= 2 && newData.child('nickname').val().length <= 16 && newData.child('joinedAt').isNumber() && (!newData.child('idToken').exists() || (newData.child('idToken').isString() && newData.child('idToken').val().length <= 4096))"
         },
         "presence": {
           "controller": {

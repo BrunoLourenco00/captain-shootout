@@ -21,6 +21,8 @@ import {
   update,
   type DatabaseReference,
 } from 'firebase/database';
+import type { CaptainSettings } from './captain';
+import { createCaptainTokenVerifier } from './captainToken';
 import { getFirebase, type FirebaseSettings } from './firebase';
 import {
   HEARTBEAT_INTERVAL_MS,
@@ -63,11 +65,19 @@ async function signInHost(auth: Auth, kiosk: KioskCredentials | null, emulator: 
   }
 }
 
+/**
+ * @param captain CAPTAIN accounts project; null = accounts not configured, every
+ *   player is a guest (plays, never reaches the leaderboard).
+ */
 export function createFirebaseHostTransport(
   settings: FirebaseSettings,
   kiosk: KioskCredentials | null,
+  captain: CaptainSettings | null,
 ): HostTransport {
   const { auth, db } = getFirebase(settings);
+  const verifyAccount = captain
+    ? createCaptainTokenVerifier({ projectId: captain.projectId, unsigned: captain.useEmulators })
+    : null;
   let current: {
     sessionId: string;
     listeners: DatabaseReference[];
@@ -151,8 +161,19 @@ export function createFirebaseHostTransport(
       if (!controller || joined) return;
       joined = true;
       void set(ref(db, `${publicPath(sessionId)}/status`), 'taken');
-      handlers.onJoin({ nickname: String(controller.nickname ?? '') });
+      void identify(controller.idToken).then((playerId) => {
+        // The session may have been closed or replaced while the token was checked.
+        if (current?.sessionId !== sessionId) return;
+        handlers.onJoin({ nickname: String(controller.nickname ?? ''), playerId });
+      });
     });
+
+    /** Verified CAPTAIN uid, or null (guest). The token never stays in the database. */
+    async function identify(idToken: unknown): Promise<string | null> {
+      if (idToken === undefined || idToken === null) return null;
+      void remove(ref(db, `${controllerPath(sessionId)}/idToken`)).catch(() => {});
+      return verifyAccount ? verifyAccount(idToken) : null;
+    }
     onValue(presenceRef, (snap) => {
       if (snap.exists()) handlers.onControllerPresence(snap.val() === true);
     });

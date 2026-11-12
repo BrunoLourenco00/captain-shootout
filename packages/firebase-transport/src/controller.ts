@@ -122,7 +122,11 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
   }
 
   return {
-    async join(params: JoinParams, requestedNickname: string): Promise<JoinResult> {
+    async join(
+      params: JoinParams,
+      requestedNickname: string,
+      accountToken: string | null,
+    ): Promise<JoinResult> {
       try {
         const me = await uid();
         const pub = (
@@ -141,6 +145,7 @@ export function createFirebaseControllerTransport(settings: FirebaseSettings): C
           nickname: requestedNickname,
           token: params.token,
           joinedAt: Date.now(),
+          ...(accountToken ? { idToken: accountToken } : {}),
         };
         try {
           await set(ref(db, controllerPath(params.sessionId)), controller);

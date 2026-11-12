@@ -32,6 +32,48 @@
         "dev:mobile:emulators"
       ],
       "port": 5174
+    },
+    {
+      "name": "emulators",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "emulators"
+      ],
+      "port": 9000
+    },
+    {
+      "name": "game-desktop-emulators-alt",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@captain/game-desktop",
+        "dev:emulators",
+        "--port",
+        "5183",
+        "--strictPort"
+      ],
+      "port": 5183
+    },
+    {
+      "name": "controller-mobile-emulators-alt",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@captain/controller-mobile",
+        "dev:emulators",
+        "--port",
+        "5184",
+        "--strictPort"
+      ],
+      "port": 5184
+    },
+    {
+      "name": "kiosk",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "kiosk"
+      ],
+      "port": 5173
     }
   ]
 }

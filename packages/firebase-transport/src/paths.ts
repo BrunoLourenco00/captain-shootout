@@ -4,7 +4,9 @@
  * sessions/{sessionId}/
  *   public      { status, hostUid, createdAt, heartbeatAt }               readable by anyone
  *   secret      { token }                                                readable by nobody
- *   controller  { uid, nickname, token, joinedAt }                       written once by the phone
+ *   controller  { uid, nickname, token, joinedAt, idToken? }             written once by the phone;
+ *                                                                        the host deletes idToken
+ *                                                                        once it has verified it
  *   presence    { controller: boolean }                                  phone, onDisconnect → false
  *   ready       boolean                                                  phone
  *   shots/{id}  ShotCommand                                              phone, create-only
@@ -37,6 +39,8 @@ export interface SessionController {
   nickname: string;
   token: string;
   joinedAt: number;
+  /** CAPTAIN account ID token (absent = guest). Removed by the host after verification. */
+  idToken?: string;
 }
 
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';

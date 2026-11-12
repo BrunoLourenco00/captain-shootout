@@ -34,6 +34,7 @@ export function toControllerView(
     score: state.score.score,
     onFire: isOnFire(state.score, config.scoring),
     multiplier: nextMultiplier(state.score, config.scoring),
+    ranked: state.playerId !== null,
     lastShot: feedback
       ? {
           shotId: feedback.shotId,

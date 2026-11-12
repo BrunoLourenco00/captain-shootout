@@ -88,11 +88,14 @@ body,
 
 /* Attract */
 .attract {
-  justify-content: space-between;
+  /* The card is centred by its auto margins, so it stays in the middle whether or
+     not the dev hint is rendered (it is absent from the kiosk build). */
+  justify-content: flex-start;
   background: linear-gradient(90deg, rgb(11 18 32 / 0.9) 0%, rgb(11 18 32 / 0.2) 60%);
 }
 
 .attract-card {
+  margin-block: auto;
   display: flex;
   align-items: center;
   gap: 3vw;
@@ -469,9 +472,29 @@ body,
 }
 
 /* Leaderboard */
+.board-window::-webkit-scrollbar {
+  display: none;
+}
+
+/* The title takes the click that toggles auto-scroll (no visual change). */
+.attract-board > .muted {
+  pointer-events: auto;
+}
+
 .attract-board {
   margin-left: auto;
   min-width: min(30vw, 420px);
+}
+
+.board-window {
+  position: relative;
+  /* Scrollable by wheel / touch, without a visible scrollbar. */
+  overflow-y: auto;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  /* Fade the edge rows so the scroll reads as a list moving past. */
+  mask-image: linear-gradient(to bottom, #000 88%, transparent);
 }
 
 .leaderboard {
@@ -496,8 +519,20 @@ body,
   font-weight: 800;
 }
 
-.leaderboard li:first-child {
-  background: var(--blue);
+/* Podium: gold, silver, bronze (dark text for contrast on the light fills). */
+.leaderboard li.podium-1 {
+  background: linear-gradient(90deg, #f5c542, #d99a1e);
+  color: var(--dark);
+}
+
+.leaderboard li.podium-2 {
+  background: linear-gradient(90deg, #e3e9f0, #aab6c4);
+  color: var(--dark);
+}
+
+.leaderboard li.podium-3 {
+  background: linear-gradient(90deg, #e09a5c, #b0682c);
+  color: var(--dark);
 }
 
 .leaderboard li.me {
@@ -527,6 +562,12 @@ body,
   font-weight: 900;
   letter-spacing: 0.08em;
   font-size: clamp(16px, 1.6vw, 32px);
+}
+
+.rank.guest {
+  background: transparent;
+  border: 2px solid currentColor;
+  opacity: 0.8;
 }
 
 .phone-lost {

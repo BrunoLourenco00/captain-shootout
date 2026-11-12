@@ -1,4 +1,5 @@
 import { readFirebaseSettings } from '@captain/firebase-transport';
+import { readCaptainSettings } from '@captain/firebase-transport/captain';
 import { createFirebaseHostTransport } from '@captain/firebase-transport/host';
 import { createFirestoreLeaderboard } from '@captain/firebase-transport/leaderboard';
 import type { HostTransport, LeaderboardStore } from '@captain/game-protocol';
@@ -21,7 +22,7 @@ function createBackend(): Backend | null {
       ? { email: env.VITE_KIOSK_EMAIL, password: env.VITE_KIOSK_PASSWORD }
       : null;
   return {
-    host: createFirebaseHostTransport(settings, kiosk),
+    host: createFirebaseHostTransport(settings, kiosk, readCaptainSettings(env)),
     leaderboard: createFirestoreLeaderboard(settings),
   };
 }

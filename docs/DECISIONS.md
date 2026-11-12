@@ -21,7 +21,7 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 
 ## Booth phone
 
-- The booth phone uses the same flow as visitors: staff re-scans the QR for each new session.
+- ~~The booth phone uses the same flow as visitors~~. Dropped on 2026-11-12: visitors play on their own phone only (it keeps their CAPTAIN sign-in).
 
 ## Desktop hardware and language
 
@@ -54,8 +54,11 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 ## Nicknames and leaderboard
 
 - 2–16 characters, auto-uppercase, small PT/EN profanity blocklist.
-- **Unique**: compared ignoring case and accents ("Bruno" = "BRÚNO").
-- One leaderboard entry per nickname; playing again with the same nickname is allowed and keeps the **best** score.
+- **CAPTAIN account = leaderboard identity** (2026-11-12, replaces "unique nickname"). The phone offers sign-in / sign-up with the **CAPTAIN app account** (Google, Apple, email; the same Firebase Auth as the app and the trycaptain.app promo page, project `captain-app23`) or **Play as a guest**.
+  - One leaderboard entry per **account** (`leaderboard/{captainUid}`), keeping the **best** score. The nickname is only a display name: it is no longer unique.
+  - **Guests play but are never ranked** (not written to the leaderboard; phone and desktop say "GUEST").
+  - The desktop does not trust the phone: the phone sends the account's Firebase **ID token**, the desktop verifies it itself (Google's public keys, issuer/audience `captain-app23`, expiry, not anonymous) and then deletes it from the session. No Cloud Function, no change to the CAPTAIN project's rules; it only needs the game domains in its Authorized domains.
+  - The phone stays signed in (Firebase persistence), so a returning player goes straight to the nickname. The shared booth phone is no longer used.
 - Leaderboard is **global forever** (single event for now).
 - Ordering: score desc, then baskets desc, then earliest completion.
 

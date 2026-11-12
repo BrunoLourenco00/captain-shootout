@@ -8,7 +8,7 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { get, ref, set, update } from 'firebase/database';
+import { get, ref, remove, set, update } from 'firebase/database';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -147,11 +147,21 @@ describe('realtime database sessions', () => {
     await assertSucceeds(get(ref(phone(), `sessions/${SID}/view`)));
     await assertFails(get(ref(phone('intruder'), `sessions/${SID}/view`)));
   });
+
+  it('accepts a bounded account token with the join, and the host can remove it', async () => {
+    await openSession();
+    const path = `sessions/${SID}/controller`;
+    await assertFails(set(ref(phone(), path), { ...controller(), idToken: 42 }));
+    await assertFails(set(ref(phone(), path), { ...controller(), idToken: 'x'.repeat(4097) }));
+    await assertSucceeds(set(ref(phone(), path), { ...controller(), idToken: 'header.body.sig' }));
+    await assertFails(get(ref(phone('intruder'), `${path}/idToken`)));
+    await assertSucceeds(remove(ref(host(), `${path}/idToken`)));
+  });
 });
 
 describe('firestore leaderboard', () => {
   const entry = {
-    key: 'BRUNO',
+    playerId: 'uid-bruno',
     nickname: 'BRUNO',
     score: 20,
     baskets: 8,
@@ -161,26 +171,29 @@ describe('firestore leaderboard', () => {
 
   it('is publicly readable', async () => {
     await assertSucceeds(
-      getDoc(doc(env.unauthenticatedContext().firestore(), 'leaderboard/BRUNO')),
+      getDoc(doc(env.unauthenticatedContext().firestore(), 'leaderboard/uid-bruno')),
     );
   });
 
   it('only the kiosk account can write', async () => {
     const kiosk = env.authenticatedContext('kiosk', { email: KIOSK_EMAIL }).firestore();
-    await assertSucceeds(setDoc(doc(kiosk, 'leaderboard/BRUNO'), entry));
+    await assertSucceeds(setDoc(doc(kiosk, 'leaderboard/uid-bruno'), entry));
     await assertFails(
-      setDoc(doc(env.authenticatedContext('phone').firestore(), 'leaderboard/BRUNO'), entry),
+      setDoc(doc(env.authenticatedContext('phone').firestore(), 'leaderboard/uid-bruno'), entry),
     );
     await assertFails(
-      setDoc(doc(env.unauthenticatedContext().firestore(), 'leaderboard/BRUNO'), entry),
+      setDoc(doc(env.unauthenticatedContext().firestore(), 'leaderboard/uid-bruno'), entry),
     );
   });
 
   it('rejects malformed entries even from the kiosk', async () => {
     const kiosk = env.authenticatedContext('kiosk', { email: KIOSK_EMAIL }).firestore();
-    await assertFails(setDoc(doc(kiosk, 'leaderboard/BRUNO'), { ...entry, key: 'OTHER' }));
-    await assertFails(setDoc(doc(kiosk, 'leaderboard/BRUNO'), { ...entry, score: -1 }));
-    await assertFails(setDoc(doc(kiosk, 'leaderboard/BRUNO'), { ...entry, baskets: 20 }));
-    await assertFails(setDoc(doc(kiosk, 'leaderboard/BRUNO'), { ...entry, admin: true }));
+    await assertFails(
+      setDoc(doc(kiosk, 'leaderboard/uid-bruno'), { ...entry, playerId: 'uid-other' }),
+    );
+    await assertFails(setDoc(doc(kiosk, 'leaderboard/uid-bruno'), { ...entry, score: -1 }));
+    await assertFails(setDoc(doc(kiosk, 'leaderboard/uid-bruno'), { ...entry, baskets: 20 }));
+    await assertFails(setDoc(doc(kiosk, 'leaderboard/uid-bruno'), { ...entry, admin: true }));
+    await assertFails(setDoc(doc(kiosk, 'leaderboard/uid-bruno'), { ...entry, playerId: null }));
   });
 });

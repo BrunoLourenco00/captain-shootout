@@ -74,8 +74,9 @@ let services: FirebaseServices | null = null;
 /** Initializes Firebase once per page. */
 export function getFirebase(settings: FirebaseSettings): FirebaseServices {
   if (services) return services;
+  // The default app only: the CAPTAIN accounts app (account.ts) is a second, named one.
   const app =
-    getApps()[0] ??
+    getApps().find((a) => a.name === '[DEFAULT]') ??
     initializeApp({
       apiKey: settings.apiKey,
       authDomain: settings.authDomain,
