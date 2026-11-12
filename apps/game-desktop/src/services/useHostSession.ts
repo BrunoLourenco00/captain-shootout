@@ -13,7 +13,8 @@ import { backend, controllerBaseUrl } from './backend';
 
 const PUBLISH_INTERVAL_MS = 250;
 const RETRY_OPEN_MS = 3000;
-const LEADERBOARD_SIZE = 5;
+/** Entries loaded for the attract board (it scrolls through them; results show the top 5). */
+const LEADERBOARD_SIZE = 20;
 
 export interface HostSessionState {
   /** Null while no session is open (or no backend configured). */
@@ -53,7 +54,7 @@ export function useHostSession(
     let cancelled = false;
     backend.host
       .openSession({
-        onJoin: ({ nickname }) => {
+        onJoin: ({ nickname, playerId }) => {
           const checked = validateNickname(nickname, config.nickname);
           const sessionId = sessionRef.current?.sessionId;
           if (!checked.ok || !sessionId) {
@@ -64,6 +65,7 @@ export function useHostSession(
             type: 'PLAYER_JOINED',
             sessionId,
             nickname: checked.nickname,
+            playerId,
             now: Date.now(),
           });
         },
@@ -126,7 +128,8 @@ export function useHostSession(
     return () => window.removeEventListener('pagehide', close);
   }, []);
 
-  // Leaderboard: (re)load on every attract screen, save each finished live round.
+  // Leaderboard: (re)load on every attract screen, save each finished round of a
+  // CAPTAIN account (guests play but are never ranked).
   const onAttract = state.status === 'attract';
   useEffect(() => {
     if (!backend || !onAttract) return;
@@ -139,12 +142,15 @@ export function useHostSession(
   const savedRound = useRef<string | null>(null);
   useEffect(() => {
     const store = backend?.leaderboard;
-    if (!store || state.status !== 'results' || state.mode !== 'live' || !state.nickname) return;
+    if (!store || state.status !== 'results' || state.mode !== 'live') return;
+    const nickname = state.nickname;
+    const playerId = state.playerId;
+    if (!nickname || !playerId) return;
     const roundId = `${state.sessionId}:${state.roundEndsAt}`;
     if (savedRound.current === roundId) return;
     savedRound.current = roundId;
     const { score, baskets, shots } = state.score;
-    store.submit({ nickname: state.nickname, score, baskets, shots, completedAt: Date.now() }).then(
+    store.submit({ playerId, nickname, score, baskets, shots, completedAt: Date.now() }).then(
       ({ rank, players }) => {
         dispatch({ type: 'RESULT_SAVED', rank, players });
         // A failed refresh must not erase the rank that was just saved.
@@ -159,6 +165,7 @@ export function useHostSession(
     state.status,
     state.mode,
     state.nickname,
+    state.playerId,
     state.sessionId,
     state.roundEndsAt,
     state.score,

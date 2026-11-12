@@ -22,10 +22,24 @@ const joined = () =>
     type: 'PLAYER_JOINED',
     sessionId: 'S1',
     nickname: 'ANA',
+    playerId: 'uid-1',
     now: 0,
   });
 
 describe('toControllerView', () => {
+  it('tells the phone whether the round is ranked (CAPTAIN account) or a guest round', () => {
+    expect(toControllerView(joined(), 0, config)?.ranked).toBe(true);
+    const guest = run(createInitialState('S1'), {
+      type: 'PLAYER_JOINED',
+      sessionId: 'S1',
+      nickname: 'ANA',
+      playerId: null,
+      now: 0,
+    });
+    expect(guest.playerId).toBeNull();
+    expect(toControllerView(guest, 0, config)?.ranked).toBe(false);
+  });
+
   it('publishes nothing on the attract screen or in demo mode', () => {
     expect(toControllerView(createInitialState('S1'), 0, config)).toBeNull();
     const demo = run(createInitialState('S1'), { type: 'DEMO_START', now: 0 });

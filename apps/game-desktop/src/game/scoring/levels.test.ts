@@ -41,7 +41,7 @@ describe('level-up in the round', () => {
   const playing = () =>
     run(
       createInitialState('S1'),
-      { type: 'PLAYER_JOINED', sessionId: 'S1', nickname: 'ANA', now: 0 },
+      { type: 'PLAYER_JOINED', sessionId: 'S1', nickname: 'ANA', playerId: 'uid-1', now: 0 },
       { type: 'PLAYER_READY', now: 0 },
       { type: 'TICK', now: 3000 },
     );

@@ -40,6 +40,8 @@ export interface GameState {
   /** Open transport session the QR code points to (null while (re)opening one). */
   sessionId: string | null;
   nickname: string | null;
+  /** Verified CAPTAIN account of the live player; null = guest (not ranked) or demo. */
+  playerId: string | null;
   controllerConnected: boolean;
   /** Leaderboard rank of the last finished round, once saved. */
   rank: number | null;
@@ -59,7 +61,13 @@ export interface GameState {
 
 export type GameAction =
   | { type: 'SESSION_OPENED'; sessionId: string }
-  | { type: 'PLAYER_JOINED'; sessionId: string; nickname: string; now: number }
+  | {
+      type: 'PLAYER_JOINED';
+      sessionId: string;
+      nickname: string;
+      playerId: string | null;
+      now: number;
+    }
   | { type: 'CONTROLLER_PRESENCE'; connected: boolean }
   | { type: 'RESULT_SAVED'; rank: number | null; players?: number | null }
   | { type: 'PLAYER_READY'; now: number }
@@ -79,6 +87,7 @@ export function createInitialState(sessionId: string | null = null): GameState {
     mode: 'live',
     sessionId,
     nickname: null,
+    playerId: null,
     controllerConnected: false,
     rank: null,
     players: null,
@@ -210,6 +219,7 @@ export function makeGameReducer(config: GameConfig) {
           status: 'connected',
           mode: 'live',
           nickname: action.nickname,
+          playerId: action.playerId,
           controllerConnected: true,
           statusEndsAt: action.now + config.readyTimeoutMs,
         };
@@ -230,7 +240,7 @@ export function makeGameReducer(config: GameConfig) {
       case 'DEMO_START':
         if (state.status !== 'attract') return state;
         return startCountdown(
-          { ...state, mode: 'demo', sessionId: DEMO_SESSION_ID, nickname: 'DEMO' },
+          { ...state, mode: 'demo', sessionId: DEMO_SESSION_ID, nickname: 'DEMO', playerId: null },
           action.now,
           config,
         );

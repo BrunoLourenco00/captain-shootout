@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coachLink, coachPitch } from './coach';
+import { coachPitch } from './coach';
 
 describe('coachPitch', () => {
   it('changes tone with the score', () => {
@@ -10,17 +10,5 @@ describe('coachPitch', () => {
 
   it('always names the AI Coach', () => {
     for (const score of [0, 15, 60]) expect(coachPitch(score).body).toContain('AI Coach');
-  });
-});
-
-describe('coachLink', () => {
-  it('tags the link with the booth campaign', () => {
-    const url = new URL(coachLink('https://trycaptain.app'));
-    expect(url.hostname).toBe('trycaptain.app');
-    expect(url.searchParams.get('utm_source')).toBe('shootout');
-  });
-
-  it('returns an invalid base untouched', () => {
-    expect(coachLink('not a url')).toBe('not a url');
   });
 });

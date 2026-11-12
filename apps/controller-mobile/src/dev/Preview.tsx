@@ -12,6 +12,7 @@ import {
 import type { ReactNode } from 'react';
 import { ERROR_MESSAGES } from '../app/controllerState';
 import {
+  AccountScreen,
   CountdownScreen,
   MessageScreen,
   NicknameScreen,
@@ -42,7 +43,13 @@ function view(overrides: Partial<ControllerView>): ControllerView {
   };
 }
 
-function results(summary: Partial<RoundSummary>, closed = false): ReactNode {
+const signInError = async () => 'Wrong email or password.';
+
+function results(
+  summary: Partial<RoundSummary>,
+  closed = false,
+  ranked: boolean | undefined = true,
+): ReactNode {
   const r: RoundSummary = {
     score: 0,
     baskets: 0,
@@ -54,7 +61,7 @@ function results(summary: Partial<RoundSummary>, closed = false): ReactNode {
   };
   return (
     <ResultsScreen
-      view={view({ status: 'results', score: r.score, results: r })}
+      view={view({ status: 'results', score: r.score, results: r, ranked })}
       sessionClosed={closed}
     />
   );
@@ -86,14 +93,36 @@ export const PREVIEWS: Preview[] = [
     render: () => <MessageScreen title="CONNECTING…" body="Hang on a second." />,
   },
   {
+    id: 'account',
+    group: 'Join',
+    label: 'CAPTAIN account / guest',
+    render: () => <AccountScreen onSignIn={signInError} onGuest={noop} />,
+  },
+  {
     id: 'nickname',
     group: 'Join',
-    label: 'Nickname',
+    label: 'Nickname (signed in)',
     render: () => (
       <NicknameScreen
         maxLength={config.nickname.maxLength}
         busy={false}
         error={null}
+        initialValue="BRUNO"
+        account={{ label: 'bruno@example.com', onSwitch: noop }}
+        onSubmit={noop}
+      />
+    ),
+  },
+  {
+    id: 'nickname-guest',
+    group: 'Join',
+    label: 'Nickname (guest)',
+    render: () => (
+      <NicknameScreen
+        maxLength={config.nickname.maxLength}
+        busy={false}
+        error={null}
+        account={{ label: null, onSwitch: noop }}
         onSubmit={noop}
       />
     ),
@@ -313,6 +342,25 @@ export const PREVIEWS: Preview[] = [
         rank: null,
         dna: dna(50, 40, 61, 33, 70),
       }),
+  },
+  {
+    id: 'results-guest',
+    group: 'Results',
+    label: 'Guest (not ranked)',
+    render: () =>
+      results(
+        {
+          score: 16,
+          baskets: 7,
+          shots: 13,
+          accuracy: 0.54,
+          rank: null,
+          players: null,
+          dna: dna(54, 45, 58, 40, 66),
+        },
+        false,
+        false,
+      ),
   },
   {
     id: 'results-closed',

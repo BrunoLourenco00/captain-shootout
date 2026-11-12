@@ -8,11 +8,13 @@ function isKiosk() {
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /leaderboard/{key} {
+    // One document per CAPTAIN account (the uid the desktop verified from the
+    // account's ID token). Guests are never written.
+    match /leaderboard/{playerId} {
       allow read: if true;
       allow write: if isKiosk()
-        && request.resource.data.keys().hasOnly(['key', 'nickname', 'score', 'baskets', 'shots', 'completedAt'])
-        && request.resource.data.key == key
+        && request.resource.data.keys().hasOnly(['playerId', 'nickname', 'score', 'baskets', 'shots', 'completedAt'])
+        && request.resource.data.playerId == playerId
         && request.resource.data.nickname is string
         && request.resource.data.nickname.size() >= 2
         && request.resource.data.nickname.size() <= 16

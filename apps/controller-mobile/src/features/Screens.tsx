@@ -1,9 +1,6 @@
 import {
-  COACH_CLOSER,
-  COACH_CTA,
   DNA_LABELS,
   DNA_ORDER,
-  coachLink,
   geneToUnlock,
   roundVerdict,
   type PlayerDna,
@@ -14,20 +11,233 @@ import {
 import { useEffect, useState, type FormEvent } from 'react';
 import { useSwipe, type SwipeTrail } from '../gestures/useSwipe';
 
-export function Wordmark() {
+/** Same top bar on every screen: the CAPTAIN logo, plus the player's name once known. */
+export function ScreenHeader({ nickname }: { nickname?: string }) {
   return (
-    <div className="wordmark">
-      CAPTAIN <span>SHOOTOUT</span>
-    </div>
+    <header className="screen-head">
+      <img className="screen-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
+      {nickname && <span className="screen-player">{nickname}</span>}
+    </header>
   );
 }
 
 export function MessageScreen({ title, body }: { title: string; body: string }) {
   return (
-    <main className="screen center">
-      <Wordmark />
-      <h1 className="title">{title}</h1>
-      <p className="body">{body}</p>
+    <main className="screen">
+      <ScreenHeader />
+      <section className="screen-hero">
+        <span className="kicker">CAPTAIN SHOOTOUT</span>
+        <h1 className="title">{title}</h1>
+        <p className="body">{body}</p>
+      </section>
+      <p className="screen-footer">45 seconds · swipe to shoot</p>
+    </main>
+  );
+}
+
+export type SignInMethod =
+  | { kind: 'google' }
+  | { kind: 'apple' }
+  | { kind: 'email'; mode: 'signin' | 'signup'; email: string; password: string };
+
+const TERMS_URL = 'https://trycaptain.app/terms';
+const PRIVACY_URL = 'https://trycaptain.app/privacy';
+/** The CAPTAIN site, tagged so visits from the game show up in the site's analytics. */
+const SITE_URL =
+  'https://trycaptain.app/?utm_source=shootout&utm_medium=booth&utm_campaign=results';
+
+/** Google "G", as on trycaptain.app and in the CAPTAIN app's sign-in screens. */
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="provider-icon" aria-hidden="true" focusable="false">
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.06H2.18A11 11 0 0 0 1 12c0 1.78.43 3.45 1.18 4.94l3.66-2.84z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.5 10.5 0 0 0 12 1 11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"
+      />
+    </svg>
+  );
+}
+
+/** Apple mark (Font Awesome brand icon, CC BY 4.0), in the text colour. */
+function AppleIcon() {
+  return (
+    <svg viewBox="0 0 384 512" className="provider-icon" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"
+      />
+    </svg>
+  );
+}
+
+/**
+ * Sign in or create a CAPTAIN account (the same account as the CAPTAIN app) to make the
+ * leaderboard, or play as a guest. Same order as the trycaptain.app sign-up page: email
+ * first, then Google and Apple. `onSignIn` resolves with an error message, or null on
+ * success / when the player just closed the popup.
+ */
+export function AccountScreen({
+  onSignIn,
+  onGuest,
+}: {
+  onSignIn: (method: SignInMethod) => Promise<string | null>;
+  onGuest: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [agreed, setAgreed] = useState(false);
+  const [mode, setMode] = useState<'signup' | 'signin'>('signup');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  async function run(method: SignInMethod) {
+    if (busy) return;
+    if (!agreed) {
+      setError('Accept the Terms and Privacy Policy to continue.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const message = await onSignIn(method);
+    setBusy(false);
+    setError(message);
+  }
+
+  function submitEmail(e: FormEvent) {
+    e.preventDefault();
+    if (email.trim() === '' || password === '') {
+      setError('Enter your email and password.');
+      return;
+    }
+    void run({ kind: 'email', mode, email: email.trim(), password });
+  }
+
+  return (
+    <main className="screen">
+      <ScreenHeader />
+      <div className="screen-center">
+        <section className="screen-hero">
+          <span className="kicker">CAPTAIN SHOOTOUT</span>
+          <h1 className="title">MAKE THE BOARD</h1>
+          <p className="body">Use your CAPTAIN app account, or create one in seconds.</p>
+        </section>
+
+        <section className="card stack" aria-label="CAPTAIN account">
+          <form className="stack" onSubmit={submitEmail} noValidate>
+            <label className="sr-only" htmlFor="account-email">
+              Email address
+            </label>
+            <input
+              id="account-email"
+              className="input plain"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              placeholder="you@email.com"
+              disabled={busy}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <label className="sr-only" htmlFor="account-password">
+              Password
+            </label>
+            <input
+              id="account-password"
+              className="input plain"
+              type="password"
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+              placeholder={mode === 'signup' ? 'Password (8+ characters)' : 'Password'}
+              disabled={busy}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="button" type="submit" disabled={busy}>
+              {busy ? 'ONE SECOND…' : mode === 'signup' ? 'CREATE ACCOUNT' : 'SIGN IN'}
+            </button>
+          </form>
+
+          <div className="divider" aria-hidden="true">
+            <span>or continue with</span>
+          </div>
+
+          <button
+            type="button"
+            className="provider-button"
+            disabled={busy}
+            onClick={() => void run({ kind: 'google' })}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+          <button
+            type="button"
+            className="provider-button"
+            disabled={busy}
+            onClick={() => void run({ kind: 'apple' })}
+          >
+            <AppleIcon />
+            Continue with Apple
+          </button>
+
+          <label className="terms">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                if (e.target.checked) setError(null);
+              }}
+            />
+            <span>
+              I agree to the CAPTAIN{' '}
+              <a href={TERMS_URL} target="_blank" rel="noreferrer">
+                Terms
+              </a>{' '}
+              and{' '}
+              <a href={PRIVACY_URL} target="_blank" rel="noreferrer">
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          <p className="account-switch">
+            {mode === 'signup' ? 'Already have a CAPTAIN account?' : 'New to CAPTAIN?'}{' '}
+            <button
+              type="button"
+              className="link inline"
+              disabled={busy}
+              onClick={() => {
+                setMode(mode === 'signup' ? 'signin' : 'signup');
+                setError(null);
+              }}
+            >
+              {mode === 'signup' ? 'Sign in' : 'Create account'}
+            </button>
+          </p>
+        </section>
+
+        <button type="button" className="link guest" disabled={busy} onClick={onGuest}>
+          Play as a guest
+        </button>
+      </div>
+      <p className="screen-footer">Guests can play, but don't appear on the leaderboard.</p>
     </main>
   );
 }
@@ -36,48 +246,82 @@ export function NicknameScreen({
   maxLength,
   busy,
   error,
+  initialValue = '',
+  account,
   onSubmit,
 }: {
   maxLength: number;
   busy: boolean;
   error: string | null;
+  initialValue?: string;
+  /**
+   * Who is playing: `label` is the CAPTAIN account (email), null for a guest.
+   * `onSwitch` signs out / goes back to sign-in.
+   */
+  account?: { label: string | null; onSwitch?: () => void };
   onSubmit: (nickname: string) => void;
 }) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(initialValue);
+  const guest = account?.label === null;
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!busy) onSubmit(value);
   }
   return (
     <main className="screen">
-      <Wordmark />
-      <form className="stack" onSubmit={submit}>
-        <label className="label" htmlFor="nickname">
-          YOUR NICKNAME
-        </label>
-        <input
-          id="nickname"
-          className="input"
-          value={value}
-          onChange={(e) => setValue(e.target.value.toUpperCase())}
-          maxLength={maxLength}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="characters"
-          spellCheck={false}
-          enterKeyHint="go"
-          placeholder="e.g. MVP23"
-          aria-invalid={error !== null}
-          aria-describedby={error ? 'nickname-error' : undefined}
-        />
-        <p id="nickname-error" className="error" role="alert">
-          {error ?? ' '}
-        </p>
-        <button className="button" type="submit" disabled={busy || value.trim().length === 0}>
-          {busy ? 'JOINING…' : 'JOIN GAME'}
-        </button>
-      </form>
-      <p className="fineprint">Your nickname appears on the public leaderboard.</p>
+      <ScreenHeader />
+      <div className="screen-center">
+        <section className="screen-hero">
+          <span className="kicker">CAPTAIN SHOOTOUT</span>
+          <h1 className="title">PICK YOUR NAME</h1>
+        </section>
+        <form className="card stack" onSubmit={submit}>
+          <label className="label" htmlFor="nickname">
+            YOUR NICKNAME
+          </label>
+          <input
+            id="nickname"
+            className="input"
+            value={value}
+            onChange={(e) => setValue(e.target.value.toUpperCase())}
+            maxLength={maxLength}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            enterKeyHint="go"
+            placeholder="e.g. MVP23"
+            aria-invalid={error !== null}
+            aria-describedby={error ? 'nickname-error' : undefined}
+          />
+          <p id="nickname-error" className="error" role="alert">
+            {error ?? ' '}
+          </p>
+          <button className="button" type="submit" disabled={busy || value.trim().length === 0}>
+            {busy ? 'JOINING…' : 'JOIN GAME'}
+          </button>
+        </form>
+        {account && (
+          <p className="account-line">
+            {guest ? 'Playing as a guest.' : `Signed in as ${account.label}.`}{' '}
+            {account.onSwitch && (
+              <button
+                type="button"
+                className="link inline"
+                disabled={busy}
+                onClick={account.onSwitch}
+              >
+                {guest ? 'Sign in to make the leaderboard' : 'Not you?'}
+              </button>
+            )}
+          </p>
+        )}
+      </div>
+      <p className="screen-footer">
+        {guest
+          ? "Guests play, but don't appear on the leaderboard."
+          : 'Your nickname appears on the public leaderboard.'}
+      </p>
     </main>
   );
 }
@@ -85,39 +329,58 @@ export function NicknameScreen({
 export function ReadyScreen({ nickname, onReady }: { nickname: string; onReady: () => void }) {
   return (
     <main className="screen">
-      <Wordmark />
-      <div className="stack center">
-        <p className="label">WELCOME</p>
-        <h1 className="name">{nickname}</h1>
+      <ScreenHeader nickname={nickname} />
+      <div className="screen-center">
+        <section className="screen-hero">
+          <span className="kicker">WELCOME</span>
+          <h1 className="name">{nickname}</h1>
+        </section>
         <HowToPlay />
+        <button className="button big" onClick={onReady}>
+          READY
+        </button>
       </div>
-      <button className="button big" onClick={onReady}>
-        READY
-      </button>
     </main>
   );
 }
 
 function HowToPlay() {
   return (
-    <ol className="howto">
-      <li>Look at the big screen.</li>
-      <li>
-        <strong>Swipe up</strong> to shoot. Not too short, not too long: find the sweet spot.
-      </li>
-      <li>Swipe a little left or right to aim.</li>
-      <li>45 seconds. Score as much as you can!</li>
-    </ol>
+    <section className="card" aria-label="How to play">
+      <h2 className="card-title">HOW TO PLAY</h2>
+      <ol className="howto">
+        <li>
+          <span>Look at the big screen.</span>
+        </li>
+        <li>
+          <span>
+            <strong>Swipe up</strong> to shoot. Not too short, not too long: find the sweet spot.
+          </span>
+        </li>
+        <li>
+          <span>Swipe a little left or right to aim.</span>
+        </li>
+        <li>
+          <span>
+            <strong>45 seconds.</strong> 5 in a row: x1.5. 10 in a row: x2.
+          </span>
+        </li>
+      </ol>
+    </section>
   );
 }
 
 export function CountdownScreen({ seconds }: { seconds: number }) {
   return (
-    <main className="screen center">
-      <p className="label">LOOK AT THE SCREEN</p>
-      <div key={seconds} className="countdown">
-        {seconds > 0 ? seconds : 'GO!'}
-      </div>
+    <main className="screen">
+      <ScreenHeader />
+      <section className="screen-hero">
+        <span className="kicker">LOOK AT THE BIG SCREEN</span>
+        <div key={seconds} className="countdown">
+          {seconds > 0 ? seconds : 'GO!'}
+        </div>
+      </section>
+      <p className="screen-footer">Get your thumb ready</p>
     </main>
   );
 }
@@ -144,13 +407,13 @@ export function PlayScreen({
     <main className="screen play">
       <header className="play-hud">
         <div>
-          <span className="label">TIME</span>
+          <span>TIME</span>
           <strong className={view.secondsLeft <= 5 ? 'urgent' : undefined}>
             {view.secondsLeft}
           </strong>
         </div>
         <div className="right">
-          <span className="label">SCORE</span>
+          <span>SCORE</span>
           <strong>{view.score}</strong>
           {view.onFire && <span className="fire">🔥 x{view.multiplier ?? 2}</span>}
         </div>
@@ -216,19 +479,16 @@ export function ResultsScreen({
   const shown = useCountUp(score);
   return (
     <main className={`screen results tier-${verdict.tier}`}>
-      <header className="results-head">
-        <img className="results-logo" src="/brand/captain-wordmark.png" alt="CAPTAIN" />
-        <span className="results-player">{view.nickname}</span>
-      </header>
+      <ScreenHeader nickname={view.nickname} />
 
       <section className="results-hero" aria-label={`${score} points`}>
-        <span className="results-kicker">{verdict.title}</span>
+        <span className="kicker tier">{verdict.title}</span>
         <div className="final" aria-hidden>
           {shown}
         </div>
         <span className="results-points">POINTS</span>
         {r?.rank != null && <RankPill rank={r.rank} players={r.players ?? null} />}
-        <p className="verdict-line">{verdict.line}</p>
+        {view.ranked === false && <p className="rank guest">GUEST · NOT ON THE BOARD</p>}
       </section>
 
       {r && (
@@ -249,13 +509,17 @@ export function ResultsScreen({
       )}
 
       {r?.dna && <DnaCard dna={r.dna} />}
-      <CoachCloser />
 
-      <p className="results-footer">
-        {sessionClosed
-          ? 'Want a rematch? Scan the new QR code on the big screen.'
-          : '📸 Screenshot this to keep your score!'}
-      </p>
+      <footer className="screen-footer results-footer">
+        <span>
+          {sessionClosed
+            ? 'Want a rematch? Scan the new QR code on the big screen.'
+            : '📸 Screenshot this to keep your score!'}
+        </span>
+        <a className="site-link" href={SITE_URL} target="_blank" rel="noreferrer">
+          trycaptain.app ↗
+        </a>
+      </footer>
     </main>
   );
 }
@@ -346,24 +610,4 @@ function useCountUp(target: number, durationMs = 900): number {
     return () => cancelAnimationFrame(id);
   }, [target, durationMs]);
   return value;
-}
-
-/** Where "Unlock my full DNA" leads (CAPTAIN app page). Overridable per deploy. */
-const COACH_URL = import.meta.env.VITE_COACH_URL || 'https://trycaptain.app';
-
-/** Closing pitch for the AI Coach in the CAPTAIN app. */
-function CoachCloser() {
-  return (
-    <section className="coach-closer" aria-label="AI Coach">
-      <h2>
-        {COACH_CLOSER.headline}
-        <span>{COACH_CLOSER.highlight}</span>
-      </h2>
-      <p>{COACH_CLOSER.body}</p>
-      <a className="coach-cta" href={coachLink(COACH_URL)} target="_blank" rel="noreferrer">
-        {COACH_CTA} <span aria-hidden>→</span>
-      </a>
-      <small>{COACH_CLOSER.fineprint}</small>
-    </section>
-  );
 }

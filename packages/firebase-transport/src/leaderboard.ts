@@ -1,6 +1,5 @@
 import {
   isBetterResult,
-  nicknameKey,
   type LeaderboardEntry,
   type LeaderboardStore,
 } from '@captain/game-protocol';
@@ -20,7 +19,7 @@ import {
 } from 'firebase/firestore';
 import { EMULATOR_PORTS, getFirebase, type FirebaseSettings } from './firebase';
 
-/** Firestore: leaderboard/{nicknameKey} holds each nickname's best result. */
+/** Firestore: leaderboard/{playerId} holds each CAPTAIN account's best result. */
 const COLLECTION = 'leaderboard';
 
 let firestore: Firestore | null = null;
@@ -37,6 +36,7 @@ function getDb(settings: FirebaseSettings): Firestore {
 
 function toEntry(data: Record<string, unknown>): LeaderboardEntry {
   return {
+    playerId: String(data.playerId ?? ''),
     nickname: String(data.nickname ?? ''),
     score: Number(data.score ?? 0),
     baskets: Number(data.baskets ?? 0),
@@ -51,16 +51,16 @@ export function createFirestoreLeaderboard(settings: FirebaseSettings): Leaderbo
 
   return {
     async submit(entry) {
-      const key = nicknameKey(entry.nickname);
-      const docRef = doc(db, COLLECTION, key);
+      if (!entry.playerId) throw new Error('Only CAPTAIN accounts are ranked');
+      const docRef = doc(db, COLLECTION, entry.playerId);
       const best = await runTransaction(db, async (tx) => {
         const snap = await tx.get(docRef);
         const current = snap.exists() ? toEntry(snap.data()) : null;
         if (current && !isBetterResult(entry, current)) return current;
-        tx.set(docRef, { ...entry, key });
+        tx.set(docRef, entry);
         return entry;
       });
-      // Rank of the nickname's best result (ties on score share the better rank).
+      // Rank of the account's best result (ties on score share the better rank).
       const [higher, all] = await Promise.all([
         getCountFromServer(query(col, where('score', '>', best.score))),
         getCountFromServer(col),

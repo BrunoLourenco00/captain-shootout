@@ -52,9 +52,9 @@ export function createMockTransport(config = DEFAULT_GAME_CONFIG): ControllerTra
   }
 
   return {
-    async join(_params, nickname) {
+    async join(_params, nickname, accountToken) {
       await new Promise((r) => setTimeout(r, 400));
-      later(0, () => publish({ status: 'connected', nickname }));
+      later(0, () => publish({ status: 'connected', nickname, ranked: accountToken !== null }));
       return { ok: true };
     },
 
@@ -70,8 +70,8 @@ export function createMockTransport(config = DEFAULT_GAME_CONFIG): ControllerTra
                 baskets,
                 shots,
                 accuracy: shots ? baskets / shots : 0,
-                rank: 3,
-                players: 120,
+                rank: view.ranked === false ? null : 3,
+                players: view.ranked === false ? null : 120,
                 dna: {
                   accuracy: shots ? Math.round((baskets / shots) * 100) : 0,
                   volume: 55,

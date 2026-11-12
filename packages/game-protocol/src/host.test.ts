@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { compareEntries, isBetterResult, type LeaderboardEntry } from './host';
 
 const entry = (score: number, baskets: number, completedAt: number): LeaderboardEntry => ({
+  playerId: 'uid-x',
   nickname: 'X',
   score,
   baskets,

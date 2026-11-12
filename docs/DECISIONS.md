@@ -21,7 +21,7 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 
 ## Booth phone
 
-- The booth phone uses the same flow as visitors: staff re-scans the QR for each new session.
+- ~~The booth phone uses the same flow as visitors~~. Dropped on 2026-11-12: visitors play on their own phone only (it keeps their CAPTAIN sign-in).
 
 ## Desktop hardware and language
 
@@ -54,8 +54,11 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 ## Nicknames and leaderboard
 
 - 2–16 characters, auto-uppercase, small PT/EN profanity blocklist.
-- **Unique**: compared ignoring case and accents ("Bruno" = "BRÚNO").
-- One leaderboard entry per nickname; playing again with the same nickname is allowed and keeps the **best** score.
+- **CAPTAIN account = leaderboard identity** (2026-11-12, replaces "unique nickname"). The phone offers sign-in / sign-up with the **CAPTAIN app account** (Google, Apple, email; the same Firebase Auth as the app and the trycaptain.app promo page, project `captain-app23`) or **Play as a guest**.
+  - One leaderboard entry per **account** (`leaderboard/{captainUid}`), keeping the **best** score. The nickname is only a display name: it is no longer unique.
+  - **Guests play but are never ranked** (not written to the leaderboard; phone and desktop say "GUEST").
+  - The desktop does not trust the phone: the phone sends the account's Firebase **ID token**, the desktop verifies it itself (Google's public keys, issuer/audience `captain-app23`, expiry, not anonymous) and then deletes it from the session. No Cloud Function, no change to the CAPTAIN project's rules; it only needs the game domains in its Authorized domains.
+  - The phone stays signed in (Firebase persistence), so a returning player goes straight to the nickname. The shared booth phone is no longer used.
 - Leaderboard is **global forever** (single event for now).
 - Ordering: score desc, then baskets desc, then earliest completion.
 
@@ -69,4 +72,4 @@ Decisions taken on 2026-11-10 that refine or override `PROJECT_SPEC.md`, `TECHNI
 - **Levels by score** (`config.levels`): still hoop until 10 points; from 10 it sways left/right, faster and wider at 25, and also bobs at 45. Shots still aim at the regulation spot, so players must lead the moving hoop.
 - ~~Clutch time~~ (last 10 s worth x2) was tried and dropped the same day in favour of the two-step streak multiplier (see Scoring).
 - Arena branding: CAPTAIN wordmark in the key and on the LED boards; **DHIKA** as official sponsor (LED boards, banners, attract screen).
-- End of round: AI Coach pitch (the coach in the CAPTAIN app), tone by score; the phone shows a "Player DNA" from the round's shots (accuracy, volume, rhythm, clutch, stamina, computed by the desktop) and an "Unlock my full DNA" button to `VITE_COACH_URL` (default `https://trycaptain.app`, tagged `utm_source=shootout`).
+- End of round: AI Coach pitch (the coach in the CAPTAIN app), tone by score; the phone shows a "Player DNA" from the round's shots (accuracy, volume, rhythm, clutch, stamina, computed by the desktop). No link or sign-up button on the phone for now: sign-up before playing is planned instead.

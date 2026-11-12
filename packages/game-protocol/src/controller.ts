@@ -37,6 +37,11 @@ export interface ControllerView {
   onFire: boolean;
   /** Multiplier the next basket gets from the streak (1 = none). Missing from older desktops. */
   multiplier?: number;
+  /**
+   * False when the desktop treats this player as a guest (no verified CAPTAIN account):
+   * the round is played but not saved to the leaderboard. Missing from older desktops.
+   */
+  ranked?: boolean;
   lastShot: ShotResult | null;
   results: RoundSummary | null;
 }
@@ -58,7 +63,11 @@ export interface JoinParams {
  * simulates the desktop for local development. UI code only talks to this interface.
  */
 export interface ControllerTransport {
-  join(params: JoinParams, nickname: string): Promise<JoinResult>;
+  /**
+   * Claims the session. `accountToken` is the CAPTAIN account's ID token (the desktop
+   * verifies it and keys the leaderboard on that account); null joins as a guest.
+   */
+  join(params: JoinParams, nickname: string, accountToken: string | null): Promise<JoinResult>;
   setReady(): Promise<void>;
   sendShot(command: ShotCommand): Promise<void>;
   /** Returns an unsubscribe function. */
@@ -72,6 +81,29 @@ export interface ControllerTransport {
    */
   resume(params: JoinParams): Promise<string | null>;
   leave(): Promise<void>;
+}
+
+/** The CAPTAIN account signed in on the phone (the same accounts as the CAPTAIN app). */
+export interface AccountUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+}
+
+/**
+ * Phone side of the CAPTAIN account. Signing in is optional: guests play but are not
+ * ranked. UI code only talks to this interface.
+ */
+export interface AccountService {
+  /** Calls back with the current user (null = signed out) now and on every change. */
+  onUser(listener: (user: AccountUser | null) => void): () => void;
+  signInWithGoogle(): Promise<void>;
+  signInWithApple(): Promise<void>;
+  signInWithEmail(email: string, password: string): Promise<void>;
+  signUpWithEmail(email: string, password: string): Promise<void>;
+  signOut(): Promise<void>;
+  /** Fresh ID token of the signed-in user, or null when signed out. */
+  idToken(): Promise<string | null>;
 }
 
 const SESSION_PARAM = 's';

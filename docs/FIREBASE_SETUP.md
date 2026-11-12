@@ -15,6 +15,12 @@ tests use the offline `demo-captain-shootout` emulator project and need none of 
 4. **Project settings → Your apps → Web app**: copy the config into the `.env.local`
    files below.
 
+5. **CAPTAIN accounts (project `captain-app23`, not this one)** → Authentication →
+   Settings → **Authorized domains**: add `challenge.trycaptain.app` and
+   `captain-shootout.web.app` (and `localhost` for testing). Without this, Google and
+   Apple sign-in on the phone fail with `auth/unauthorized-domain` (players can still
+   play as guests). Nothing else changes in the CAPTAIN project: no rules, no functions.
+
 ## 2. Local env files (never committed)
 
 `apps/controller-mobile/.env.local`
@@ -68,11 +74,16 @@ hours: if it is not ready in time, use `https://captain-shootout.web.app` as
 
 1. `pnpm kiosk` on the kiosk, open http://localhost:5173 in Chrome.
 2. Scan the QR with a phone on the hotspot, join, press READY, shoot a few times.
-3. After the results, the nickname appears under TOP SCORES with its rank.
-4. Firebase console → Firestore → `leaderboard` has the entry.
+3. Sign in with a CAPTAIN account (Google, Apple or email). After the results, the
+   nickname appears under TOP SCORES with its rank.
+4. Firebase console → Firestore → `leaderboard` has a document named after the CAPTAIN
+   account uid.
+5. Scan again and choose **Play as a guest**: the round plays, the results say
+   "GUEST", and nothing new is written to `leaderboard`.
 
 ## Resetting the leaderboard
 
-Delete the documents in Firestore `leaderboard` from the console (e.g. after test
+Delete the documents in Firestore `leaderboard` from the console. Entries written before
+2026-11-12 are keyed by nickname (no `playerId`): delete them all once (e.g. after test
 rounds, before doors open). Old `sessions` in RTDB are removed automatically 20 s after
 each round; leftovers from crashes are harmless and can be deleted from the console.

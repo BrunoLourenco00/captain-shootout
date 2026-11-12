@@ -6,15 +6,22 @@
   --border: #e1e7ef;
   --hot: #ff7a1a;
   --danger: #ff5c5c;
-  font-family:
-    'Inter',
-    'Helvetica Neue',
-    'Segoe UI',
-    system-ui,
-    -apple-system,
-    sans-serif;
-  color: var(--light);
-  background: var(--dark);
+  /* Phone theme (from the Player DNA design), shared by every screen. */
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --r-bg: oklch(14% 0.03 262);
+  --r-fg: oklch(97% 0.01 250);
+  --r-card: oklch(19% 0.04 262);
+  --r-primary: oklch(62% 0.19 258);
+  --r-glow: oklch(78% 0.15 230);
+  --r-secondary: oklch(24% 0.04 262);
+  --r-muted: oklch(68% 0.04 255);
+  --r-accent: oklch(80% 0.17 65);
+  --r-line: oklch(100% 0 0 / 0.09);
+  --r-gradient: linear-gradient(135deg, var(--r-primary), var(--r-glow));
+  --r-shadow: 0 10px 40px -10px color-mix(in oklab, var(--r-primary) 60%, transparent);
+  font-family: 'Barlow', 'Inter', system-ui, sans-serif;
+  color: var(--r-fg);
+  background: var(--r-bg);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -30,92 +37,184 @@ body,
   overscroll-behavior: none;
 }
 
+/* Every screen: logo bar on top, content in a centered column, footer at the bottom. */
 .screen {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  gap: clamp(10px, 2dvh, 18px);
+  padding: max(clamp(12px, 2dvh, 20px), env(safe-area-inset-top)) 12px
+    max(clamp(12px, 2dvh, 20px), env(safe-area-inset-bottom));
+  overflow-x: clip;
+  text-align: center;
+  background:
+    radial-gradient(120% 60% at 50% 0%, oklch(32% 0.12 260 / 0.7), transparent 60%), var(--r-bg);
 }
 
-.screen.center {
-  justify-content: center;
+.screen > * {
+  width: 100%;
+  max-width: 448px;
+  margin-inline: auto;
+}
+
+.screen-head {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
+  min-height: 27px;
+}
+
+.screen-logo {
+  height: 19px;
+  width: auto;
+}
+
+.screen-player {
+  max-width: 55%;
+  padding: 4px 12px;
+  border: 1px solid var(--r-line);
+  border-radius: 999px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--r-muted);
+}
+
+/* The main block sits in the middle of the free space. */
+.screen-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-block: auto;
+}
+
+/* Title plus its form or card, kept together in the middle of the screen. */
+.screen-center {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3dvh, 28px);
+  margin-block: auto;
+}
+
+.screen-center .screen-hero {
+  margin-block: 0;
+}
+
+.kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--r-glow);
+}
+
+.screen-footer {
+  margin: auto 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--r-line);
+  font-size: 12px;
+  color: var(--r-muted);
+}
+
+.results-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.site-link {
+  flex: none;
+  padding: 6px 0;
+  color: var(--r-glow);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.screen-hero + .screen-footer,
+.card + .screen-footer {
+  margin-top: 0;
+}
+
+.title,
+.name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 60px color-mix(in oklab, var(--r-glow) 45%, transparent);
+}
+
+.name {
+  font-size: clamp(56px, 10dvh, 80px);
+  word-break: break-word;
+}
+
+.body {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--r-muted);
+  max-width: 28ch;
+}
+
+.card {
+  padding: 16px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
+  background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
+  text-align: left;
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.025em;
 }
 
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.stack.center {
-  align-items: center;
-  text-align: center;
-}
-
-.wordmark {
-  font-size: 24px;
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: 0.08em;
-  text-align: center;
-}
-
-.wordmark span {
-  color: var(--blue);
-}
-
-.title {
-  margin: 0;
-  font-size: 40px;
-  font-weight: 900;
-  font-style: italic;
-}
-
-.body {
-  margin: 0;
-  font-size: 18px;
-  color: var(--border);
-  max-width: 28ch;
+  gap: 10px;
 }
 
 .label {
   margin: 0;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: 0.2em;
-  color: var(--border);
-  opacity: 0.8;
-}
-
-.name {
-  margin: 0;
-  font-size: 44px;
-  font-weight: 900;
-  font-style: italic;
-  word-break: break-word;
+  color: var(--r-glow);
 }
 
 /* 16px+ prevents iOS from zooming on focus. */
 .input {
   width: 100%;
-  font: inherit;
-  font-size: 24px;
+  font-family: var(--display);
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: 0.06em;
-  padding: 16px;
+  padding: 12px 16px;
   border-radius: 14px;
-  border: 2px solid var(--secondary);
-  background: #131c30;
-  color: var(--light);
+  border: 1px solid var(--r-line);
+  background: var(--r-secondary);
+  color: var(--r-fg);
   outline: none;
 }
 
+.input::placeholder {
+  color: var(--r-muted);
+  opacity: 0.5;
+}
+
 .input:focus {
-  border-color: var(--blue);
+  border-color: var(--r-glow);
 }
 
 .input[aria-invalid='true'] {
@@ -125,6 +224,7 @@ body,
 .error {
   margin: 0;
   min-height: 1.4em;
+  font-size: 14px;
   color: var(--danger);
   font-weight: 600;
 }
@@ -133,11 +233,12 @@ body,
   width: 100%;
   min-height: 60px;
   border: none;
-  border-radius: 16px;
-  background: var(--blue);
-  color: var(--light);
-  font: inherit;
-  font-size: 20px;
+  border-radius: 999px;
+  background: var(--r-gradient);
+  box-shadow: var(--r-shadow);
+  color: var(--r-fg);
+  font-family: var(--display);
+  font-size: 24px;
   font-weight: 900;
   letter-spacing: 0.1em;
   touch-action: manipulation;
@@ -149,35 +250,196 @@ body,
 }
 
 .button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+/* Sign-in providers, as on trycaptain.app and in the app: 52 px, 18 px corners,
+   logo + 12 px gap. */
+.provider-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 1px solid var(--r-line);
+  border-radius: 18px;
+  background: var(--r-secondary);
+  color: var(--r-fg);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.provider-button:active {
+  transform: scale(0.98);
+}
+
+.provider-button:disabled {
+  opacity: 0.5;
+}
+
+.provider-icon {
+  flex: none;
+  width: 19px;
+  height: 19px;
+}
+
+/* "or continue with" between the email form and the providers. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--r-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--r-line);
+}
+
+.account-switch {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--r-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Text button. */
+.link {
+  padding: 10px 4px;
+  border: none;
+  background: none;
+  color: var(--r-glow);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.link:disabled {
+  opacity: 0.4;
+}
+
+.link.inline {
+  padding: 0;
+  font-size: inherit;
+}
+
+.link.guest {
+  align-self: center;
+  min-height: 44px;
+  font-size: 16px;
+  color: var(--r-fg);
+}
+
+/* Email/password: body font, not the display nickname style. */
+.input.plain {
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.terms {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--r-muted);
+}
+
+.terms input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--r-primary);
+}
+
+.terms a {
+  color: var(--r-fg);
+}
+
+.account-line {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--r-muted);
+  overflow-wrap: anywhere;
 }
 
 .button.big {
-  min-height: 88px;
-  font-size: 28px;
-}
-
-.fineprint {
-  margin: 0;
-  font-size: 13px;
-  color: var(--border);
-  opacity: 0.6;
-  text-align: center;
+  min-height: 80px;
+  font-size: 32px;
 }
 
 .howto {
-  margin: 8px 0 0;
-  padding-left: 1.4em;
-  text-align: left;
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--border);
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--r-muted);
+}
+
+.howto li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.howto li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--r-gradient);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--r-fg);
+}
+
+.howto strong {
+  color: var(--r-fg);
 }
 
 .countdown {
-  font-size: 160px;
+  font-family: var(--display);
+  font-size: clamp(160px, 30dvh, 240px);
   font-weight: 900;
-  font-style: italic;
+  line-height: 1;
+  text-shadow: 0 0 80px color-mix(in oklab, var(--r-glow) 55%, transparent);
   animation: pop 0.9s ease-out;
 }
 
@@ -186,9 +448,9 @@ body,
   inset: 0 0 auto;
   z-index: 10;
   padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
-  background: var(--hot);
+  background: var(--r-accent);
   color: var(--dark);
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -199,23 +461,49 @@ body,
   height: 100dvh;
 }
 
+/* Full-bleed: the swipe area uses the whole phone. */
+.screen.play > * {
+  width: auto;
+  max-width: none;
+  margin-inline: 0;
+}
+
+.screen.play > .swipe-area {
+  margin: 0 12px max(12px, env(safe-area-inset-bottom));
+}
+
 .play-hud {
   display: flex;
   justify-content: space-between;
-  padding: max(16px, env(safe-area-inset-top)) 20px 12px;
+  gap: 8px;
+  padding: max(12px, env(safe-area-inset-top)) 12px 12px;
 }
 
 .play-hud div {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  min-width: 96px;
+  padding: 8px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--r-line);
+  background: color-mix(in oklab, var(--r-card) 70%, transparent);
 }
 
 .play-hud .right {
   align-items: flex-end;
 }
 
+.play-hud span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--r-muted);
+}
+
 .play-hud strong {
-  font-size: 36px;
+  font-family: var(--display);
+  font-size: 44px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -225,22 +513,26 @@ body,
   color: var(--hot);
 }
 
-.fire {
+.play-hud .fire {
   margin-top: 4px;
   padding: 2px 10px;
   border-radius: 999px;
   background: var(--hot);
+  font-family: var(--display);
   font-weight: 900;
-  font-size: 14px;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  color: var(--r-fg);
 }
 
 .swipe-area {
   position: relative;
   flex: 1;
-  margin: 0 12px max(12px, env(safe-area-inset-bottom));
   border-radius: 24px;
-  border: 2px dashed rgb(225 231 239 / 0.25);
-  background: radial-gradient(ellipse at 50% 85%, rgb(22 104 214 / 0.35), transparent 65%);
+  border: 1px dashed color-mix(in oklab, var(--r-primary) 45%, transparent);
+  background:
+    radial-gradient(ellipse at 50% 85%, oklch(62% 0.19 258 / 0.35), transparent 65%),
+    color-mix(in oklab, var(--r-card) 40%, transparent);
   /* Only the gameplay surface blocks scrolling/zooming gestures. */
   touch-action: none;
   user-select: none;
@@ -257,11 +549,11 @@ body,
   inset: 40% 0 auto;
   margin: 0;
   text-align: center;
-  font-weight: 900;
+  font-family: var(--display);
+  font-weight: 800;
   letter-spacing: 0.12em;
-  font-size: 20px;
-  color: var(--border);
-  opacity: 0.7;
+  font-size: 24px;
+  color: var(--r-muted);
   animation: nudge 1.6s ease-in-out infinite;
 }
 
@@ -296,9 +588,10 @@ body,
   position: absolute;
   inset: 18% 0 auto;
   text-align: center;
-  font-size: 44px;
+  font-family: var(--display);
+  font-size: 56px;
   font-weight: 900;
-  font-style: italic;
+  line-height: 1;
   animation: fade-up 1.2s ease-out forwards;
   pointer-events: none;
   display: flex;
@@ -307,8 +600,8 @@ body,
 }
 
 .shot-result small {
-  font-size: 24px;
-  color: var(--blue);
+  font-size: 30px;
+  color: var(--r-glow);
 }
 
 .shot-result.perfect {
@@ -316,40 +609,20 @@ body,
 }
 
 .shot-result.missed {
-  color: var(--secondary);
-  font-size: 32px;
+  color: var(--r-muted);
+  font-size: 40px;
 }
 
 /* Results: Player DNA card layout (ported from the Lovable design) */
+.results .tier {
+  color: var(--tier);
+}
+
 .results {
-  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
-  --r-bg: oklch(14% 0.03 262);
-  --r-fg: oklch(97% 0.01 250);
-  --r-card: oklch(19% 0.04 262);
-  --r-primary: oklch(62% 0.19 258);
-  --r-glow: oklch(78% 0.15 230);
-  --r-secondary: oklch(24% 0.04 262);
-  --r-muted: oklch(68% 0.04 255);
-  --r-accent: oklch(80% 0.17 65);
-  --r-line: oklch(100% 0 0 / 0.09);
-  --r-gradient: linear-gradient(135deg, var(--r-primary), var(--r-glow));
-  --r-shadow: 0 10px 40px -10px color-mix(in oklab, var(--r-primary) 60%, transparent);
   --tier: var(--r-glow);
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: 20px;
-  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
-  font-family: 'Barlow', 'Inter', system-ui, sans-serif;
-  color: var(--r-fg);
-  text-align: center;
-  background:
-    radial-gradient(120% 60% at 50% 0%, oklch(32% 0.12 260 / 0.7), transparent 60%), var(--r-bg);
 }
 
 .results > * {
-  width: 100%;
-  max-width: 448px;
-  margin-inline: auto;
   animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
@@ -381,47 +654,15 @@ body,
   --tier: var(--r-muted);
 }
 
-.results-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.results-logo {
-  height: 22px;
-  width: auto;
-}
-
-.results-player {
-  max-width: 55%;
-  padding: 4px 12px;
-  border: 1px solid var(--r-line);
-  border-radius: 999px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--r-muted);
-}
-
 .results-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.results-kicker {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  color: var(--tier);
-}
-
 .final {
   font-family: var(--display);
-  font-size: 144px;
+  font-size: clamp(80px, 14dvh, 120px);
   font-weight: 900;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -429,30 +670,29 @@ body,
 }
 
 .results-points {
-  margin-top: -8px;
-  font-size: 14px;
+  margin-top: -6px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.2em;
   color: var(--r-muted);
 }
 
 .rank {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   padding: 8px 16px;
   border-radius: 999px;
   background: var(--r-gradient);
   box-shadow: var(--r-shadow);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-.verdict-line {
-  max-width: 320px;
-  margin: 12px 0 0;
-  font-size: 14px;
-  line-height: 1.4;
+.rank.guest {
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid var(--r-line);
   color: var(--r-muted);
 }
 
@@ -466,7 +706,7 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 0;
+  padding: clamp(7px, 1.2dvh, 10px) 0;
   border-radius: 16px;
   border: 1px solid var(--r-line);
   background: color-mix(in oklab, var(--r-card) 70%, transparent);
@@ -474,7 +714,7 @@ body,
 
 .stats strong {
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -488,7 +728,7 @@ body,
 
 /* Player DNA */
 .dna-card {
-  padding: 20px;
+  padding: clamp(12px, 2dvh, 16px) 16px;
   border-radius: 24px;
   border: 1px solid color-mix(in oklab, var(--r-primary) 30%, transparent);
   background: linear-gradient(160deg, oklch(26% 0.08 260 / 0.8), oklch(17% 0.04 262 / 0.9));
@@ -504,9 +744,10 @@ body,
 
 .dna-head h2 {
   margin: 0;
+  min-width: 0;
   white-space: nowrap;
   font-family: var(--display);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.025em;
 }
@@ -522,7 +763,7 @@ body,
 .dna-helix {
   display: block;
   width: 100%;
-  height: 80px;
+  height: clamp(44px, 8dvh, 72px);
 }
 
 .dna-helix .rung {
@@ -548,17 +789,17 @@ body,
 
 .dna-bars {
   list-style: none;
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: clamp(6px, 1dvh, 9px);
 }
 
 .dna-bars li {
   display: grid;
-  grid-template-columns: 2.5rem 1fr 2rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr) 1.75rem;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .dna-bars abbr {
@@ -598,75 +839,57 @@ body,
 }
 
 .dna-gene {
-  margin: 16px 0 0;
+  margin: clamp(8px, 1.5dvh, 12px) 0 0;
   padding: 12px;
   border-radius: 12px;
   background: color-mix(in oklab, var(--r-accent) 10%, transparent);
-  font-size: 14px;
-  line-height: 1.43;
+  font-size: 13px;
+  line-height: 1.375;
 }
 
 .dna-gene b {
   color: var(--r-accent);
 }
 
-/* AI Coach closer */
-.coach-closer {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-}
+/* Wider phones and up: the roomier sizes of the design. */
+@media (min-width: 640px) {
+  .screen {
+    padding-inline: 16px;
+  }
 
-.coach-closer h2 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 1.25;
-}
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+  }
 
-.coach-closer h2 span {
-  display: block;
-  color: var(--r-glow);
-}
+  .final {
+    font-size: clamp(96px, 15dvh, 128px);
+  }
 
-.coach-closer p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.43;
-  color: var(--r-muted);
-}
+  .results-points {
+    font-size: 14px;
+    letter-spacing: 0.3em;
+  }
 
-.coach-cta {
-  display: block;
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--r-gradient);
-  box-shadow: var(--r-shadow);
-  color: var(--light);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  transition: transform 0.15s;
-}
+  .rank {
+    font-size: 14px;
+  }
 
-.coach-cta:active {
-  transform: scale(0.95);
-}
+  .stats strong {
+    font-size: 32px;
+  }
 
-.coach-closer small {
-  font-size: 12px;
-  color: var(--r-muted);
-}
+  .dna-card {
+    padding: 20px;
+  }
 
-.results-footer {
-  margin: 0;
-  padding-top: 16px;
-  border-top: 1px solid var(--r-line);
-  font-size: 12px;
-  color: var(--r-muted);
+  .dna-head h2 {
+    font-size: 24px;
+  }
+
+  .dna-gene {
+    font-size: 14px;
+  }
 }
 
 @keyframes rise {

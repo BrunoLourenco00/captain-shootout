@@ -1,5 +1,6 @@
 import { coachPitch, type GameConfig, type LeaderboardEntry } from '@captain/game-protocol';
 import { QRCodeSVG } from 'qrcode.react';
+import { useEffect, useRef } from 'react';
 import { levelIndex } from '../../game/scoring/levels';
 import { accuracy, nextMultiplier } from '../../game/scoring/scoring';
 import type { GameState, ShotFeedback } from '../../game/state/gameState';
@@ -39,24 +40,141 @@ function QrSlot({ host }: { host: HostSessionState }) {
   );
 }
 
+/** Podium colours for the first three places (gold, silver, bronze). */
+function rowClass(index: number, isMe: boolean): string | undefined {
+  const classes = [index < 3 ? `podium-${index + 1}` : '', isMe ? 'me' : ''].filter(Boolean);
+  return classes.length > 0 ? classes.join(' ') : undefined;
+}
+
 function LeaderboardList({
   entries,
   highlight,
+  hidden,
 }: {
   entries: LeaderboardEntry[];
+  /** playerId of the entry to highlight. */
   highlight?: string;
+  /** Visual copy only (the looping board's second pass): hidden from screen readers. */
+  hidden?: boolean;
 }) {
   if (entries.length === 0) return null;
   return (
-    <ol className="leaderboard">
+    <ol className="leaderboard" aria-hidden={hidden || undefined}>
       {entries.map((e, i) => (
-        <li key={e.nickname} className={e.nickname === highlight ? 'me' : undefined}>
+        <li
+          key={e.playerId || `${i}-${e.nickname}`}
+          className={rowClass(i, Boolean(highlight && e.playerId === highlight))}
+        >
           <span className="pos">{i + 1}</span>
           <span className="nick">{e.nickname}</span>
           <span className="pts">{e.score}</span>
         </li>
       ))}
     </ol>
+  );
+}
+
+/** Rows visible at once on the attract board; the rest scroll past. */
+const VISIBLE_ROWS = 5;
+/** Slow, continuous auto-scroll speed. */
+const SCROLL_PX_PER_SECOND = 14;
+/** Rest on the top rows when the attract screen appears. */
+const DWELL_MS = 2500;
+/** After a manual scroll (wheel / touch), auto-scroll waits this long before resuming. */
+const MANUAL_PAUSE_MS = 6000;
+
+/**
+ * Operator toggle, deliberately invisible: clicking "TOP SCORES" turns auto-scroll
+ * off / on. Module-level so it survives every new attract screen until a page reload.
+ */
+let autoScrollEnabled = true;
+
+/**
+ * Attract-screen leaderboard: a window of VISIBLE_ROWS rows that glides slowly through
+ * the whole list as an endless loop: the list is drawn twice, and whenever the first
+ * copy has scrolled past, the position wraps back by one copy (invisible, so #1 follows
+ * the last place). It can also be scrolled by hand (wheel / touch, no visible
+ * scrollbar), with the same wrap. With reduced motion, or no more rows than fit, it
+ * does not move by itself.
+ */
+function ScrollingBoard({ entries }: { entries: LeaderboardEntry[] }) {
+  const windowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const box = windowRef.current;
+    if (!box) return;
+    const lists = box.querySelectorAll<HTMLElement>('ol');
+    const first = lists.item(0);
+    const copy = lists.item(1) as HTMLElement | null;
+    if (!first || !copy) {
+      box.style.height = '';
+      return;
+    }
+    const rows = first.querySelectorAll<HTMLElement>('li');
+    // Distance from one copy to the next: scrolling by exactly this looks identical.
+    let period = 0;
+    const fit = () => {
+      const last = rows.item(VISIBLE_ROWS - 1);
+      box.style.height = `${last.offsetTop + last.offsetHeight}px`;
+      period = copy.offsetTop - first.offsetTop;
+    };
+    fit();
+    window.addEventListener('resize', fit);
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Float position: scrollTop rounds, so sub-pixel steps would otherwise be lost.
+    let position = 0;
+    let restUntil = performance.now() + DWELL_MS;
+    let lastFrame = performance.now();
+    let frame = 0;
+
+    const pauseForManual = () => {
+      restUntil = performance.now() + MANUAL_PAUSE_MS;
+    };
+    const onWheel = (e: WheelEvent) => {
+      pauseForManual();
+      // Scrolling up past #1 continues from the end of the list.
+      if (e.deltaY < 0 && box.scrollTop + e.deltaY < 0) box.scrollTop += period;
+    };
+    box.addEventListener('wheel', onWheel, { passive: true });
+    box.addEventListener('touchstart', pauseForManual, { passive: true });
+
+    const step = (now: number) => {
+      const dt = now - lastFrame;
+      lastFrame = now;
+      frame = requestAnimationFrame(step);
+      // Follow any manual scroll so auto-scroll continues from where the operator left it.
+      if (Math.abs(box.scrollTop - position) > 1) position = box.scrollTop;
+      if (autoScrollEnabled && !reduced && now >= restUntil) {
+        position += (SCROLL_PX_PER_SECOND * dt) / 1000;
+      }
+      // Past the first copy: wrap back by one copy (same picture, endless loop).
+      if (period > 0 && position >= period) position -= period;
+      if (Math.abs(box.scrollTop - position) >= 0.5) box.scrollTop = position;
+    };
+    // With reduced motion the loop still runs (for the manual-scroll wrap) but never moves.
+    frame = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', fit);
+      box.removeEventListener('wheel', onWheel);
+      box.removeEventListener('touchstart', pauseForManual);
+      box.scrollTop = 0;
+    };
+  }, [entries]);
+
+  return (
+    <>
+      {/* Clicking the title toggles auto-scroll (hidden operator feature, no visual cue). */}
+      <p className="muted" onClick={() => (autoScrollEnabled = !autoScrollEnabled)}>
+        TOP SCORES
+      </p>
+      <div className="board-window" ref={windowRef}>
+        <LeaderboardList entries={entries} />
+        {entries.length > VISIBLE_ROWS && <LeaderboardList entries={entries} hidden />}
+      </div>
+    </>
   );
 }
 
@@ -75,8 +193,7 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
         </div>
         {host.leaderboard.length > 0 && (
           <div className="attract-board">
-            <p className="muted">TOP SCORES</p>
-            <LeaderboardList entries={host.leaderboard} />
+            <ScrollingBoard entries={host.leaderboard} />
           </div>
         )}
       </div>
@@ -232,8 +349,14 @@ export function ResultsOverlay({
         </div>
       </div>
       {state.rank !== null && <p className="rank">#{state.rank} ON THE LEADERBOARD</p>}
+      {state.mode === 'live' && state.playerId === null && (
+        <p className="rank guest">GUEST · SIGN IN TO MAKE THE LEADERBOARD</p>
+      )}
       {state.mode === 'live' && (
-        <LeaderboardList entries={leaderboard} highlight={state.nickname ?? undefined} />
+        <LeaderboardList
+          entries={leaderboard.slice(0, VISIBLE_ROWS)}
+          highlight={state.playerId ?? undefined}
+        />
       )}
       {state.mode === 'live' && <CoachLine score={score} />}
       <p className="tagline">NEXT PLAYER IN {secondsLeft(state.statusEndsAt, now)}s</p>
@@ -241,13 +364,13 @@ export function ResultsOverlay({
   );
 }
 
-/** AI Coach pitch for the crowd; the player gets the button on their phone. */
+/** AI Coach pitch for the crowd; the player's DNA is on their phone. */
 function CoachLine({ score }: { score: number }) {
   const pitch = coachPitch(score);
   return (
     <div className="coach-line">
       <strong>{pitch.headline}</strong>
-      <span>Train with the AI Coach in the CAPTAIN app. Tap the button on your phone.</span>
+      <span>Your Player DNA is on your phone. The AI Coach in the CAPTAIN app trains it.</span>
     </div>
   );
 }

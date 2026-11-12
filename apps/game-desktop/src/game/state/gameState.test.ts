@@ -20,7 +20,7 @@ function shot(shotId: string, sessionId = SESSION): ShotCommand {
 function playing(): GameState {
   return run(
     createInitialState(SESSION),
-    { type: 'PLAYER_JOINED', sessionId: SESSION, nickname: 'BRUNO', now: 0 },
+    { type: 'PLAYER_JOINED', sessionId: SESSION, nickname: 'BRUNO', playerId: 'uid-1', now: 0 },
     { type: 'PLAYER_READY', now: 0 },
     { type: 'TICK', now: 3000 },
   );
@@ -29,7 +29,13 @@ function playing(): GameState {
 describe('state machine', () => {
   it('runs attract → connected → countdown → playing → finished → results → attract', () => {
     let s = createInitialState(SESSION);
-    s = run(s, { type: 'PLAYER_JOINED', sessionId: SESSION, nickname: 'BRUNO', now: 0 });
+    s = run(s, {
+      type: 'PLAYER_JOINED',
+      sessionId: SESSION,
+      nickname: 'BRUNO',
+      playerId: 'uid-1',
+      now: 0,
+    });
     expect(s.status).toBe('connected');
     s = run(s, { type: 'PLAYER_READY', now: 1000 });
     expect(s.status).toBe('countdown');
@@ -51,6 +57,7 @@ describe('state machine', () => {
       type: 'PLAYER_JOINED',
       sessionId: SESSION,
       nickname: 'X',
+      playerId: 'uid-1',
       now: 0,
     });
     s = run(s, { type: 'TICK', now: config.readyTimeoutMs });
@@ -60,9 +67,25 @@ describe('state machine', () => {
 
   it('ignores joins for another session or while a game is running', () => {
     const s = createInitialState(SESSION);
-    expect(run(s, { type: 'PLAYER_JOINED', sessionId: 'OTHER', nickname: 'X', now: 0 })).toBe(s);
+    expect(
+      run(s, {
+        type: 'PLAYER_JOINED',
+        sessionId: 'OTHER',
+        nickname: 'X',
+        playerId: 'uid-1',
+        now: 0,
+      }),
+    ).toBe(s);
     const p = playing();
-    expect(run(p, { type: 'PLAYER_JOINED', sessionId: SESSION, nickname: 'Y', now: 0 })).toBe(p);
+    expect(
+      run(p, {
+        type: 'PLAYER_JOINED',
+        sessionId: SESSION,
+        nickname: 'Y',
+        playerId: 'uid-1',
+        now: 0,
+      }),
+    ).toBe(p);
   });
 
   it('demo mode starts a countdown from attract without a phone', () => {
@@ -83,7 +106,9 @@ describe('state machine', () => {
 
   it('nobody can join while no session is open', () => {
     const s = createInitialState();
-    expect(run(s, { type: 'PLAYER_JOINED', sessionId: 'S1', nickname: 'X', now: 0 })).toBe(s);
+    expect(
+      run(s, { type: 'PLAYER_JOINED', sessionId: 'S1', nickname: 'X', playerId: 'uid-1', now: 0 }),
+    ).toBe(s);
   });
 
   it('a phone disconnect does not stop the round', () => {
