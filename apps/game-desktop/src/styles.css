@@ -110,6 +110,10 @@ body,
   gap: 3vw;
 }
 
+.attract-card.solo {
+  justify-content: center;
+}
+
 .qr-slot {
   width: min(28vh, 360px);
   aspect-ratio: 1;

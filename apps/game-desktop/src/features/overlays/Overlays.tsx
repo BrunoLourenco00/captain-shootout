@@ -189,7 +189,8 @@ export function AttractOverlay({ host }: { host: HostSessionState }) {
   return (
     <div className="overlay attract">
       <Wordmark />
-      <div className="attract-card">
+      {/* Without scores the QR and call to action sit in the middle of the screen. */}
+      <div className={`attract-card${host.leaderboard.length > 0 ? '' : ' solo'}`}>
         <div className="qr-slot" aria-label="QR code" data-join-url={host.joinUrl ?? undefined}>
           <QrSlot host={host} />
         </div>
