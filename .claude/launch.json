@@ -74,6 +74,19 @@
         "kiosk"
       ],
       "port": 5173
+    },
+    {
+      "name": "game-desktop-alt",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@captain/game-desktop",
+        "dev",
+        "--port",
+        "5185",
+        "--strictPort"
+      ],
+      "port": 5185
     }
   ]
 }

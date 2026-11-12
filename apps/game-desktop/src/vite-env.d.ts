@@ -1,5 +1,8 @@
 /// <reference types="vite/client" />
 
+/** Fontsource maps these imports to CSS files. */
+declare module '@fontsource/big-shoulders-display/*';
+
 interface ImportMetaEnv {
   readonly VITE_CONTROLLER_BASE_URL?: string;
   readonly VITE_FIREBASE_API_KEY?: string;
