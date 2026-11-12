@@ -10,9 +10,10 @@ describe('roundVerdict', () => {
   it('picks the tier from the score', () => {
     expect(roundVerdict(round({ score: 0 })).tier).toBe('airball');
     expect(roundVerdict(round({ score: 4 })).tier).toBe('rookie');
-    expect(roundVerdict(round({ score: 10 })).tier).toBe('starter');
-    expect(roundVerdict(round({ score: 25 })).tier).toBe('allstar');
-    expect(roundVerdict(round({ score: 60 })).title).toBe('MVP');
+    expect(roundVerdict(round({ score: 8 })).tier).toBe('starter');
+    expect(roundVerdict(round({ score: 20 })).tier).toBe('allstar');
+    expect(roundVerdict(round({ score: 19 })).tier).toBe('starter');
+    expect(roundVerdict(round({ score: 35 })).title).toBe('MVP');
   });
 
   it('gives the same line for the same round', () => {
